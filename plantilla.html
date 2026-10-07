@@ -104,10 +104,11 @@
   .badge.compact .pill { padding: 3px; gap: 0; }
   /* nombre de cada ciudad junto a su punto; aparece al acercarse y se oculta si choca con otra etiqueta */
   .city { transform: translate(7px, -50%); pointer-events: none; transition: opacity .25s; white-space: nowrap; }
-  .city span { pointer-events: auto; cursor: pointer; font: 600 10.5px Inter, sans-serif; color: var(--text); letter-spacing: .01em;
-    padding: 1px 6px; border-radius: 6px; background: rgba(36, 20, 5, .72); border: 1px solid rgba(255, 204, 51, .22); }
+  .city span { pointer-events: auto; cursor: pointer; font: 600 9.5px Inter, sans-serif; color: var(--text); letter-spacing: .01em;
+    padding: 1px 5px; border-radius: 6px; background: rgba(36, 20, 5, .72); border: 1px solid rgba(255, 204, 51, .22); }
   .city span:hover { border-color: rgba(255, 204, 51, .7); color: #ffcc33; }
   .city b { color: #ffcc33; font-weight: 700; margin-left: 4px; }
+  @media (max-width: 760px) { .city span { font-size: 8.5px; padding: 0 4px; } }
 
   /* ---------- sede: La Villa de Los Santos */
   .sede { transform: translate(-50%, -50%); pointer-events: auto; cursor: pointer; position: relative; width: 46px; height: 46px; }
@@ -448,7 +449,7 @@ function makeCity(c) {
   return d;
 }
 // los nombres de ciudad solo se muestran de cerca, para no tapar los indicadores por país
-const CITY_ALT = LITE ? 0.85 : 1.25;
+const CITY_ALT = LITE ? 0.6 : 1.0;
 function updateBadges() {
   const cam = globe.camera().position, alt = globe.pointOfView().altitude;
   const len = Math.hypot(cam.x, cam.y, cam.z);
@@ -492,11 +493,13 @@ function layoutBadges() {
     placed.push(compact ? small : full);
   });
   // ciudades: las de más estudiantes primero; si una etiqueta choca con otra ya puesta, se oculta (el punto sigue visible)
+  // de lejos solo las ciudades con 2+ estudiantes; cada etiqueta deja un margen libre alrededor
+  const minN = globe.pointOfView().altitude > CITY_ALT * 0.55 ? 2 : 1, M = LITE ? 4 : 6;
   all.filter(c => c._city && c.__el && c.__el._vis).sort((a, b) => b.n - a.n).forEach(c => {
     const e = c.__el, r = e.getBoundingClientRect();
     if (!r.width) return;
-    const box = { left: r.left, right: r.right, top: r.top, bottom: r.bottom };
-    const free = !placed.some(p => overlap(box, p));
+    const box = { left: r.left - M, right: r.right + M, top: r.top - M, bottom: r.bottom + M };
+    const free = c.n >= minN && !placed.some(p => overlap(box, p));
     e.style.opacity = free ? 1 : 0;
     e.firstChild.style.pointerEvents = free ? 'auto' : 'none';
     if (free) placed.push(box);
