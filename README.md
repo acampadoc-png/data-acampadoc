@@ -14,6 +14,7 @@ Sitio público: https://acampadoc-png.github.io/data-acampadoc/ (GitHub Pages, r
 Después de cualquier cambio: `python construir.py`, revisar, y subir `index.html` junto con lo modificado.
 
 ## Reglas
+- **Mapas: nunca la proyección de Mercator.** El globo 3D no deforma tamaños. Todo mapa plano (vistas, imágenes, informes, redes) usa **Equal Earth** (en web: `d3.geoEqualEarth`; referencia: https://www.equal-earth.com). Decisión de ACAMPADOC, octubre 2026, en línea con la campaña Correct The Map respaldada por la Unión Africana.
 - Solo datos públicos: nombre, ciudad, país, programa, años, proyecto, rol y enlace al video. Nunca correos, teléfonos, direcciones, documentos ni datos de salud o bancarios.
 - Los estudiantes aceptaron aparecer (confirmado por ACAMPADOC, octubre 2026).
 - Cortos de estudiantes de 2025 y 2026 no se enlazan (siguen en festivales).
