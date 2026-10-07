@@ -102,6 +102,12 @@
   .badge .nums span::before { content: ""; display: inline-block; width: 6px; height: 6px; border-radius: 50%; margin-right: 3px; vertical-align: 1px; background: currentColor; }
   .badge.compact .name, .badge.compact .nums { display: none; }
   .badge.compact .pill { padding: 3px; gap: 0; }
+  /* nombre de cada ciudad junto a su punto; aparece al acercarse y se oculta si choca con otra etiqueta */
+  .city { transform: translate(7px, -50%); pointer-events: none; transition: opacity .25s; white-space: nowrap; }
+  .city span { pointer-events: auto; cursor: pointer; font: 600 10.5px Inter, sans-serif; color: var(--text); letter-spacing: .01em;
+    padding: 1px 6px; border-radius: 6px; background: rgba(36, 20, 5, .72); border: 1px solid rgba(255, 204, 51, .22); }
+  .city span:hover { border-color: rgba(255, 204, 51, .7); color: #ffcc33; }
+  .city b { color: #ffcc33; font-weight: 700; margin-left: 4px; }
 
   /* ---------- sede: La Villa de Los Santos */
   .sede { transform: translate(-50%, -50%); pointer-events: auto; cursor: pointer; position: relative; width: 46px; height: 46px; }
@@ -370,7 +376,7 @@ const globe = Globe()(el)
   // arcos animados desde cada país hacia la sede
   .arcStartLat('lat').arcStartLng('lng').arcEndLat(() => SEDE.lat).arcEndLng(() => SEDE.lng)
   .arcColor(a => [`rgba(${RGB[a.l]},0.05)`, `rgba(${RGB[a.l]},0.95)`])
-  .arcStroke(a => Math.min(0.9, 0.22 + Math.sqrt(a.n) * 0.06))
+  .arcStroke(a => Math.min(0.9, 0.22 + Math.sqrt(a.n) * 0.06) * zoomK)
   .arcAltitudeAutoScale(0.42)
   .arcDashLength(0.35).arcDashGap(0.9).arcDashInitialGap(a => a.g).arcDashAnimateTime(a => CALM ? 0 : a.t)
   .arcLabel(a => `<div style="font:600 12px Inter,sans-serif;background:rgba(36,20,5,.94);color:#FCF6DB;padding:5px 9px;border-radius:8px">${esc(a.pa)} → La Villa de Los Santos</div>`)
@@ -404,7 +410,7 @@ if ('IntersectionObserver' in window) new IntersectionObserver(es => { offscreen
 globe.controls().addEventListener('change', () => {
   const alt = globe.pointOfView().altitude;
   const k = Math.min(1, Math.max(0.12, alt / BASE_ALT));
-  if (Math.abs(k - zoomK) / zoomK > 0.04) { zoomK = k; globe.pointRadius(globe.pointRadius()); }
+  if (Math.abs(k - zoomK) / zoomK > 0.04) { zoomK = k; globe.pointRadius(globe.pointRadius()); globe.arcStroke(globe.arcStroke()); }
   updateBadges();
 });
 
@@ -433,18 +439,28 @@ function makeBadge(c) {
   d.onpointerdown = e => e.stopPropagation();
   return d;
 }
+function makeCity(c) {
+  const d = document.createElement('div');
+  d.className = 'city';
+  d.innerHTML = `<span>${esc(c.ci)}${c.n > 1 ? `<b>${c.n}</b>` : ''}</span>`;
+  d.firstChild.onclick = e => { e.stopPropagation(); openCountry(c.pa, c); };
+  d.onpointerdown = e => e.stopPropagation();
+  return d;
+}
+// los nombres de ciudad solo se muestran de cerca, para no tapar los indicadores por país
+const CITY_ALT = LITE ? 0.85 : 1.25;
 function updateBadges() {
   const cam = globe.camera().position, alt = globe.pointOfView().altitude;
   const len = Math.hypot(cam.x, cam.y, cam.z);
   const data = globe.htmlElementsData();
-  const totals = data.filter(c => !c._sede).map(total).sort((a, b) => b - a);
+  const totals = data.filter(c => !c._sede && !c._city).map(total).sort((a, b) => b - a);
   const cut = alt > 1.8 ? (totals[LITE ? 3 : 6] || 0) : alt > 1.1 ? (totals[LITE ? 8 : 16] || 0) : 0;
   data.forEach(c => {
     const e = c.__el; if (!e) return;
     const p = globe.getCoords(c.lat, c.lng, 0);
-    const vis = (p.x * cam.x + p.y * cam.y + p.z * cam.z) / (Math.hypot(p.x, p.y, p.z) * len) > 0.18;
-    e.style.opacity = vis ? 1 : 0;
-    e.style.pointerEvents = vis ? 'auto' : 'none';
+    const vis = (p.x * cam.x + p.y * cam.y + p.z * cam.z) / (Math.hypot(p.x, p.y, p.z) * len) > 0.18 && (!c._city || alt < CITY_ALT);
+    if (c._city) { if (!vis) { e.style.opacity = 0; e.firstChild.style.pointerEvents = 'none'; } }   // la visibilidad final la decide layoutBadges
+    else { e.style.opacity = vis ? 1 : 0; e.style.pointerEvents = vis ? 'auto' : 'none'; }
     e._vis = vis; e._cut = cut;
   });
 }
@@ -459,7 +475,7 @@ function layoutBadges() {
     const r = sede.__el.getBoundingClientRect();
     if (r.width) placed.push({ left: r.left - 4, right: r.right + 4, top: r.top - 4, bottom: r.bottom + 22 });
   }
-  const list = all.filter(c => !c._sede && c.__el && c.__el._vis).sort((a, b) => total(b) - total(a));
+  const list = all.filter(c => !c._sede && !c._city && c.__el && c.__el._vis).sort((a, b) => total(b) - total(a));
   const overlap = (r, p) => !(r.right < p.left + 3 || r.left > p.right - 3 || r.bottom < p.top + 3 || r.top > p.bottom - 3);
   list.forEach(c => {
     const e = c.__el, tot = total(c);
@@ -475,15 +491,25 @@ function layoutBadges() {
     e.style.zIndex = compact ? 1 : 2;
     placed.push(compact ? small : full);
   });
+  // ciudades: las de más estudiantes primero; si una etiqueta choca con otra ya puesta, se oculta (el punto sigue visible)
+  all.filter(c => c._city && c.__el && c.__el._vis).sort((a, b) => b.n - a.n).forEach(c => {
+    const e = c.__el, r = e.getBoundingClientRect();
+    if (!r.width) return;
+    const box = { left: r.left, right: r.right, top: r.top, bottom: r.bottom };
+    const free = !placed.some(p => overlap(box, p));
+    e.style.opacity = free ? 1 : 0;
+    e.firstChild.style.pointerEvents = free ? 'auto' : 'none';
+    if (free) placed.push(box);
+  });
 }
 setInterval(() => { if (!paused) layoutBadges(); }, LITE ? 350 : 220);
-globe.htmlElement(c => { const e = c._sede ? makeSede() : makeBadge(c); c.__el = e; return e; });
+globe.htmlElement(c => { const e = c._sede ? makeSede() : c._city ? makeCity(c) : makeBadge(c); c.__el = e; return e; });
 
 // ------------------------------------------------------------------ render
 function render() {
   view = compute();
   globe.pointsData(view.cities);
-  globe.htmlElementsData([...view.countries, { _sede: true, lat: SEDE.lat, lng: SEDE.lng, pa: SEDE.pa }]);
+  globe.htmlElementsData([...view.countries, ...view.cities.map(c => ({ ...c, _city: true })), { _sede: true, lat: SEDE.lat, lng: SEDE.lng, pa: SEDE.pa }]);
   // un arco por país (color de la capa con más registros); la animación se desfasa para que no vayan sincronizados
   globe.arcsData(view.countries.filter(c => Math.hypot(c.lat - SEDE.lat, c.lng - SEDE.lng) > 0.8)
     .sort((a, b) => total(b) - total(a)).slice(0, LITE ? 14 : 80)
