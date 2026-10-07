@@ -237,7 +237,7 @@
   <div class="kpis">
     <div class="kpi est"><b id="kEst">0</b><small>Estudiantes</small></div>
     <div class="kpi doc"><b id="kDoc">0</b><small>Equipo y doc.</small></div>
-    <div class="kpi pel"><b id="kPel">0</b><small>Películas</small></div>
+    <div class="kpi pel"><b id="kPel">0</b><small>Pelis festival</small></div>
     <div class="kpi"><b id="kPai">0</b><small>Países</small></div>
   </div>
 </section>
@@ -250,7 +250,7 @@
   <div class="layers glass">
     <button class="layer est on" data-l="est"><i></i>Estudiantes</button>
     <button class="layer doc on" data-l="doc"><i></i>Equipo y docentes</button>
-    <button class="layer pel on" data-l="pel"><i></i>Películas</button>
+    <button class="layer pel on" data-l="pel"><i></i>Selección oficial · Festival</button>
   </div>
   <div class="subfilters glass">
     <button class="mini on" data-p="Residencia">Residencia</button>
@@ -588,7 +588,7 @@ function fillCountry(pa) {
   if (!c[tab].length) tab = c.est.length ? 'est' : c.doc.length ? 'doc' : 'pel';
   const tabs = document.getElementById('tabs');
   tabs.innerHTML = '';
-  [['est', 'Estudiantes', c.est.length], ['doc', 'Equipo y docentes', nDoc], ['pel', 'Películas', c.pel.length]].forEach(([l, t, n]) => {
+  [['est', 'Estudiantes', c.est.length], ['doc', 'Equipo y docentes', nDoc], ['pel', 'Festival (selección oficial)', c.pel.length]].forEach(([l, t, n]) => {
     if (!n) return;
     const b = document.createElement('button');
     b.className = `tab ${l}` + (tab === l ? ' on' : '');
@@ -621,10 +621,11 @@ function fillCountry(pa) {
   } else {
     const byYear = {};
     c.pel.forEach(f => (byYear[f.y] = byYear[f.y] || []).push(f));
+    html += `<div class="sedeinfo">Películas de la <b>Selección Oficial del Festival ACAMPADOC</b> (2012–2026). No son los cortos realizados por los estudiantes.</div>`;
     Object.keys(byYear).sort().reverse().forEach(y => {
-      html += `<div class="grp">Festival ${y} · ${byYear[y].length}</div>`;
+      html += `<div class="grp">Selección oficial · Festival ${y} · ${byYear[y].length}</div>`;
       byYear[y].forEach(f => html += `<div class="item" data-k="${esc(fold(f.t))}"><div class="av film" style="background:${C.pel}">▶</div><div><div class="t">${esc(f.t)}</div>
-        <div class="m">${f.d ? 'Dir. ' + esc(f.d) + ' · ' : ''}${f.y}</div></div></div>`);
+        <div class="m">${f.d ? 'Dir. ' + esc(f.d) + ' · ' : ''}${f.y}</div>${f.tr ? `<a class="vimeo" href="${esc(f.tr)}" data-t="${esc(f.t)}" target="_blank" rel="noopener">▶ Ver tráiler</a>` : ''}</div></div>`);
     });
   }
   list.innerHTML = html || '<div class="empty">Sin registros con los filtros actuales.</div>';
@@ -668,6 +669,8 @@ const PEERTUBE = ['exquisite.tube'];
 function vimeoEmbed(u) {
   const m = String(u).match(/vimeo\.com\/(?:video\/)?(\d+)(?:\/([0-9a-f]{6,}))?/i);
   if (m) return `https://player.vimeo.com/video/${m[1]}?autoplay=1&dnt=1${m[2] ? '&h=' + m[2] : ''}`;
+  const yt = String(u).match(/(?:youtube\.com\/watch\?v=|youtu\.be\/)([\w-]{11})/);   // tráileres del canal YouTube de ACAMPADOC
+  if (yt) return `https://www.youtube-nocookie.com/embed/${yt[1]}?autoplay=1&rel=0`;
   const pt = String(u).match(/^https:\/\/([^/]+)\/(?:w|videos\/watch|videos\/embed)\/([\w-]+)/);
   return pt && PEERTUBE.includes(pt[1]) ? `https://${pt[1]}/videos/embed/${pt[2]}?autoplay=1&warningTitle=0&p2p=0` : null;
 }
