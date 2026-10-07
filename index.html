@@ -233,7 +233,7 @@
       <h1>Una comunidad que recorre el mundo</h1>
     </div>
   </div>
-  <p>Estudiantes, equipo, docentes y películas que han pasado por ACAMPADOC. Todos los caminos llevan a <b>La Villa de Los Santos, Panamá</b>. Gira el planeta y toca un país.</p>
+  <p>Estudiantes y equipo docente de la escuela ACAMPADOC, y las películas de la <b>Selección Oficial del Festival</b> (en rojo; no son cortos de estudiantes). Todos los caminos llevan a <b>La Villa de Los Santos, Panamá</b>. Gira el planeta y toca un país.</p>
   <div class="kpis">
     <div class="kpi est"><b id="kEst">0</b><small>Estudiantes</small></div>
     <div class="kpi doc"><b id="kDoc">0</b><small>Equipo y doc.</small></div>
@@ -606,7 +606,7 @@ function fillCountry(pa) {
       html += `<div class="grp">${esc(ci)} · ${ps.length}</div>`;
       ps.sort((a, b) => a.n.localeCompare(b.n, 'es')).forEach(p => {
         const meta = p.ys.map(([y, v]) => `${y}${v.p.length ? ' · ' + v.p.join('/') : ''}${v.c ? '' : '<span class="tagp">por confirmar</span>'}`).join('<br>');
-        const films = (p.v || []).map(([t, u]) => `<a class="vimeo" href="${esc(u)}" data-t="${esc(t)}" target="_blank" rel="noopener">▶ Ver su película${p.v.length > 1 ? ': ' + esc(t) : ''}</a>`).join('');
+        const films = (p.v || []).map(([t, u]) => `<a class="vimeo" href="${esc(u)}" data-t="${esc(t)}" target="_blank" rel="noopener">▶ Ver su corto hecho en ACAMPADOC${p.v.length > 1 ? ': ' + esc(t) : ''}</a>`).join('');
         html += personItem(p, 'est', meta, (p.pr ? `<div class="pr">«${esc(p.pr)}»</div>` : '') + films);
       });
     });
@@ -727,7 +727,7 @@ q.oninput = () => {
   view.est.forEach(p => { if (fold(p.n).includes(t) || fold(p.pr).includes(t)) hits.push({ col: C.est, label: p.n, sub: p.ci || p.pa,
     go: go(p.pa, 'est', p.n, view.cities.find(c => c.ci === p.ci && c.pa === p.pa)) }); });
   [...new Map(view.doc.map(d => [d.n, d])).values()].forEach(d => { if (fold(d.n).includes(t)) hits.push({ col: C.doc, label: d.n, sub: 'equipo y docentes · ' + d.pa, go: go(d.pa, 'doc', d.n) }); });
-  view.pel.forEach(f => { if (fold(f.t).includes(t) || fold(f.d).includes(t)) hits.push({ col: C.pel, label: f.t, sub: f.pa + ' · ' + f.y, go: go(f.pa, 'pel', f.t) }); });
+  view.pel.forEach(f => { if (fold(f.t).includes(t) || fold(f.d).includes(t)) hits.push({ col: C.pel, label: f.t, sub: 'Selección oficial Festival ' + f.y + ' · ' + f.pa, go: go(f.pa, 'pel', f.t) }); });
   if ('la villa de los santos sede'.includes(t)) hits.unshift({ col: '#be202e', label: 'La Villa de Los Santos', sub: 'sede', go: openSede });
   hits.slice(0, 14).forEach(h => {
     const d = document.createElement('div');
