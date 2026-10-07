@@ -162,6 +162,42 @@
   .sedeinfo { padding: 12px 10px 4px; font-size: 13px; line-height: 1.5; color: var(--muted); }
   .sedeinfo b { color: var(--text); }
 
+  /* pantallas bajas (zoom alto del navegador, laptops pequeñas, celular horizontal): compactar para que todo quepa */
+  @media (min-width: 761px) and (max-height: 820px) {
+    .brand { padding: 10px 14px 12px; width: 310px; }
+    .brand p { display: none; }
+    .brand .logo { width: 44px; height: 44px; flex-basis: 44px; }
+    .brand h1 { font-size: 17px; }
+    .kpis { margin-top: 10px; }
+    .kpi b { font-size: 17px; }
+    .timeline { bottom: 12px; padding: 8px 12px 6px; }
+    .tl-head { margin-bottom: 4px; }
+    .bars { height: 60px; }
+    .tl-note { display: none; }
+    #panel { bottom: 12px; }
+  }
+  @media (min-width: 761px) and (max-height: 620px) {
+    .brand, .tools { top: 10px; }
+    .brand { left: 10px; } .tools { right: 10px; gap: 6px; }
+    .kpi { padding: 6px 6px 4px; } .kpi small { font-size: 9px; }
+    .layer { padding: 6px 4px; }
+    .subfilters { padding: 5px 8px; }
+    .timeline { bottom: 8px; width: min(980px, calc(100% - 20px)); }
+    .bars { height: 50px; gap: 4px; }
+    .bar .n { font-size: 10px; margin-bottom: 1px; }
+    #tlHint { display: none; }
+    /* el panel usa toda la altura y tapa los filtros mientras está abierto (se cierra con ×) */
+    #panel { top: 10px; bottom: 8px; right: 10px; }
+    body:has(#panel.open) .tools { visibility: hidden; }
+  }
+  @media (min-width: 761px) and (max-height: 450px) {
+    .brand .kicker, .tl-head span:not(.big) { display: none; }
+    .brand .logo { width: 36px; height: 36px; flex-basis: 36px; }
+    .brand h1 { font-size: 15px; }
+    .kpis { margin-top: 6px; }
+    .bars { height: 44px; }
+  }
+
   @media (max-width: 760px) {
     .brand { right: 12px; left: 12px; top: 12px; width: auto; padding: 10px 12px 12px; }
     .brand p { display: none; }
@@ -596,7 +632,7 @@ panel.querySelector('.close').onclick = closePanel;
 // ------------------------------------------------------------------ reproductor de Vimeo
 // vimeo.com/123456 (público) o vimeo.com/123456/abc123 (oculto, con su clave) → player.vimeo.com/video/123456?h=abc123
 // clave de los cortos protegidos en Vimeo (la pide el reproductor); vacía = no se muestra
-const CLAVE_VIMEO = "";
+const CLAVE_VIMEO = /*__CLAVE__*/'';
 const player = document.getElementById('player'), plFrame = document.getElementById('plFrame');
 // servidores PeerTube permitidos: exquisite.tube/w/ID o /videos/watch/ID → exquisite.tube/videos/embed/ID
 const PEERTUBE = ['exquisite.tube'];
