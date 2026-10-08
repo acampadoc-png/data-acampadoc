@@ -13,6 +13,10 @@ Sitio público: https://acampadoc-png.github.io/data-acampadoc/ (GitHub Pages, r
 
 Después de cualquier cambio: `python construir.py`, revisar, y subir `index.html` junto con lo modificado.
 
+## Música
+Las 15 pistas de `musica/` son interpretaciones del acordeonista **Gelo Córdoba** (Mogollón, Los Santos), figura del patrimonio musical de Panamá; el concurso de acordeón del Festival de Guararé lleva su nombre. Él compuso *La espigadilla* y *Pica pica*; los demás temas son de otros compositores (Paris Vásquez, Artemio Vargas, Toñito Sáenz, Casimiro Pimentel, Alberto Rodríguez, Colaco Cortez, José de la Rosa Cedeño, Sacramento Córdoba) o tradicionales. El reproductor muestra título, compositor y el crédito a Gelo Córdoba.
+**Derechos:** pendiente guardar aquí la autorización escrita (familia de Gelo Córdoba o titular de la grabación) antes de presentar la música como libre de derechos.
+
 ## Reglas
 - **Mapas: nunca la proyección de Mercator.** El globo 3D no deforma tamaños. Todo mapa plano (vistas, imágenes, informes, redes) usa **Equal Earth** (en web: `d3.geoEqualEarth`; referencia: https://www.equal-earth.com). Decisión de ACAMPADOC, octubre 2026, en línea con la campaña Correct The Map respaldada por la Unión Africana.
 - Solo datos públicos: nombre, ciudad, país, programa, años, proyecto, rol y enlace al video. Nunca correos, teléfonos, direcciones, documentos ni datos de salud o bancarios.

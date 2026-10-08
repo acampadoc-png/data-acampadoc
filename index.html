@@ -826,7 +826,8 @@ render();
   vol.value = Math.round(VOL * 100);
   const guardar = v => { try { localStorage.setItem(KEY, v ? 'on' : 'off'); } catch (e) {} };
   const pintar = () => {
-    const on = !audio.paused, tema = on ? '♪ ' + MUSICA[pista].t + ' · álbum de Gelo Córdoba' : 'Música: álbum de Gelo Córdoba';
+    const m = MUSICA[pista], comp = m.a && m.a !== 'D.R.A.' && m.a !== 'Gelo Cordoba' ? ' (' + m.a + ')' : '';
+    const on = !audio.paused, tema = on ? '♪ ' + m.t + comp + ' · Gelo Córdoba, acordeón' : 'Música: Gelo Córdoba · patrimonio musical de Panamá';
     btn.classList.toggle('sonando', on); btn.setAttribute('aria-pressed', String(on));
     btn.classList.toggle('espera', !on && quiere && !cargada);
     txt.textContent = on ? 'Silenciar música' : 'Activar música';
