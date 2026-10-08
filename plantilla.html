@@ -240,6 +240,10 @@
     <div class="kpi pel"><b id="kPel">0</b><small>Pelis festival</small></div>
     <div class="kpi"><b id="kPai">0</b><small>Países</small></div>
   </div>
+  <button id="musica" class="musica" type="button" hidden aria-pressed="false">
+    <span class="eq" aria-hidden="true"><i></i><i></i><i></i></span>
+    <span class="mcol"><span class="mtxt">Activar música</span><small class="mcred"></small></span>
+  </button>
 </section>
 
 <section class="tools" id="tools">
@@ -285,6 +289,22 @@
   </div>
 </div>
 
+<style id="musica-css">
+  .musica { margin-top: 10px; width: 100%; display: flex; align-items: center; gap: 10px; min-height: 44px; padding: 8px 14px; border-radius: 12px; cursor: pointer;
+    border: 1px solid rgba(255,204,51,.45); background: rgba(255,204,51,.12); color: var(--text); font: 600 13px Inter, sans-serif; text-align: left; transition: background .2s, border-color .2s; }
+  .musica:hover, .musica:focus-visible { background: rgba(255,204,51,.22); border-color: var(--amarillo); outline: none; }
+  .musica[hidden] { display: none !important; }
+  .musica .eq { display: inline-flex; align-items: flex-end; gap: 2px; width: 16px; height: 16px; flex: 0 0 16px; }
+  .musica .eq i { flex: 1; height: 30%; background: var(--amarillo); border-radius: 1px; }
+  .musica.sonando .eq i { animation: eq .9s ease-in-out infinite; }
+  .musica.sonando .eq i:nth-child(2) { animation-delay: .25s; } .musica.sonando .eq i:nth-child(3) { animation-delay: .5s; }
+  .musica:not(.sonando) .eq i { background: var(--muted); }
+  @keyframes eq { 0%, 100% { height: 25%; } 50% { height: 100%; } }
+  .musica .mcol { display: flex; flex-direction: column; min-width: 0; line-height: 1.25; }
+  .musica .mcred { font-weight: 500; font-size: 10.5px; color: var(--muted); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+  .musica .mcred:empty { display: none; }
+  @media (prefers-reduced-motion: reduce) { .musica.sonando .eq i { animation: none; height: 70%; } }
+</style>
 <script src="https://cdn.jsdelivr.net/npm/topojson-client@3.1.0/dist/topojson-client.min.js"></script>
 <script src="https://cdn.jsdelivr.net/npm/globe.gl@2.33.1/dist/globe.gl.min.js"></script>
 <script>
@@ -738,6 +758,44 @@ q.oninput = () => {
 };
 
 render();
+</script>
+<script>
+/* Música de fondo. Ligera: el audio NO se descarga hasta el primer gesto del visitante (toque, clic, tecla o scroll) y se carga una pista a la vez.
+   Para activarla, listar los archivos en MUSICA (rutas relativas, carpeta musica/). Con la lista vacía el botón no aparece. */
+(function () {
+  const MUSICA = [{s:"musica/pista-01.mp3",t:"Canajagua azul",a:"Paris Vasquez"},{s:"musica/pista-02.mp3",t:"Aires santeños",a:"Tradicional"},{s:"musica/pista-03.mp3",t:"La viudita de la miel",a:"Artemio Vargas"},{s:"musica/pista-04.mp3",t:"La flor de Liola",a:"Toñito Saenz"},{s:"musica/pista-05.mp3",t:"Me voy de Padasi",a:"Casimiro Pimentel"},{s:"musica/pista-06.mp3",t:"A Chitre",a:"Alberto Rodriguez"},{s:"musica/pista-07.mp3",t:"Sinceridad",a:"Toñito Saenz"},{s:"musica/pista-08.mp3",t:"Todo en la vida pasa",a:"Colaco Cortez"},{s:"musica/pista-09.mp3",t:"La espigadilla",a:"Gelo Cordoba"},{s:"musica/pista-10.mp3",t:"Pica pica",a:"Gelo Cordoba"},{s:"musica/pista-11.mp3",t:"Rascate",a:"D.R.A."},{s:"musica/pista-12.mp3",t:"Arroz con mango",a:"Colaco Cortez"},{s:"musica/pista-13.mp3",t:"El bandido",a:"D.R.A."},{s:"musica/pista-14.mp3",t:"Amor lindo",a:"Jose de la Rosa Cedeño"},{s:"musica/pista-15.mp3",t:"Mogollon",a:"Sacramento Cordoba"}];  // colección de música tradicional (Gelo Córdoba); títulos y autores tal como vienen en los archivos
+  const VOL = 0.35, KEY = 'acampadoc-musica';
+  const btn = document.getElementById('musica');
+  if (!btn || !MUSICA.length) return;
+  const txt = btn.querySelector('.mtxt'), cred = btn.querySelector('.mcred');
+  const audio = new Audio(); audio.preload = 'none'; audio.volume = 0; audio.loop = MUSICA.length === 1;
+  let pista = Math.floor(Math.random() * MUSICA.length), cargada = false, quiere = true, fade = 0;
+  try { quiere = localStorage.getItem(KEY) !== 'off'; } catch (e) {}
+  const guardar = v => { try { localStorage.setItem(KEY, v ? 'on' : 'off'); } catch (e) {} };
+  const pintar = () => {
+    const on = !audio.paused;
+    cred.textContent = on ? '♪ ' + MUSICA[pista].t + ' · ' + MUSICA[pista].a : '';
+    btn.classList.toggle('sonando', on); btn.setAttribute('aria-pressed', String(on));
+    txt.textContent = on ? 'Silenciar música' : 'Activar música';
+    btn.setAttribute('aria-label', txt.textContent);
+  };
+  const volumen = (a, ms, fin) => { clearInterval(fade); const v0 = audio.volume, t0 = performance.now();
+    fade = setInterval(() => { const k = Math.min(1, (performance.now() - t0) / ms); audio.volume = v0 + (a - v0) * k; if (k >= 1) { clearInterval(fade); fin && fin(); } }, 50); };
+  const sonar = () => {
+    if (!cargada) { audio.src = MUSICA[pista].s; cargada = true; }
+    const p = audio.play(); audio.volume = 0;
+    (p && p.then ? p : Promise.resolve()).then(() => { volumen(VOL, 700); pintar(); }).catch(() => pintar());
+  };
+  const parar = () => volumen(0, 400, () => { audio.pause(); pintar(); });
+  audio.addEventListener('ended', () => { pista = (pista + 1) % MUSICA.length; audio.src = MUSICA[pista].s; sonar(); });
+  audio.addEventListener('play', pintar); audio.addEventListener('pause', pintar);
+  btn.hidden = false; pintar();
+  btn.addEventListener('click', e => { e.stopPropagation(); if (audio.paused) { quiere = true; guardar(true); sonar(); } else { quiere = false; guardar(false); parar(); } });
+  const EV = ['pointerdown', 'touchstart', 'keydown', 'wheel'];
+  const primero = e => { if (btn.contains(e.target)) return; EV.forEach(n => removeEventListener(n, primero, true)); if (quiere && audio.paused) sonar(); };
+  EV.forEach(n => addEventListener(n, primero, { capture: true, passive: true }));
+  document.addEventListener('visibilitychange', () => { if (!cargada) return; if (document.hidden) audio.pause(); else if (quiere) sonar(); });
+})();
 </script>
 </body>
 </html>
