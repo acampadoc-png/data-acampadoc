@@ -59,6 +59,7 @@
     display: flex; align-items: center; justify-content: center; gap: 6px; color: var(--muted); transition: all .2s; white-space: nowrap; }
   .layer i { width: 9px; height: 9px; border-radius: 50%; flex: 0 0 9px; }
   .layer .sh { display: none; }
+  .layer.pel .lg { display: none; } .layer.pel .sh { display: inline; }
   .layer.on { color: var(--text); background: rgba(252,246,219,.07); }
   .layer.est i { background: var(--est); } .layer.doc i { background: var(--doc); } .layer.pel i { background: var(--pel); }
   .layer.on i { box-shadow: 0 0 10px currentColor; }
@@ -186,6 +187,12 @@
   .musica .mcred:empty { display: none; }
   @media (prefers-reduced-motion: reduce) { .musica.espera { animation: none; } }
 
+  .mctl { display: flex; align-items: center; gap: 6px; margin-top: 8px; }
+  .mctl[hidden] { display: none; }
+  .mctl button { flex: 0 0 44px; width: 44px; height: 44px; display: grid; place-items: center; border-radius: 50%; cursor: pointer; padding: 0; border: 1px solid var(--line); background: rgba(252,246,219,.08); color: var(--text); }
+  .mctl button:hover, .mctl button:focus-visible { border-color: var(--amarillo); outline: none; }
+  .mctl input { flex: 1; min-width: 0; height: 44px; accent-color: var(--amarillo); cursor: pointer; margin: 0; }
+
   /* pantallas bajas (zoom alto del navegador, laptops pequeñas, celular horizontal): compactar para que todo quepa */
   @media (min-width: 761px) and (max-height: 820px) {
     .brand { padding: 10px 14px 12px; width: 310px; }
@@ -299,6 +306,11 @@
     <span class="mcol"><span class="mtxt">Activar música</span><small class="mcred"></small></span>
   </button>
   <div class="mnow" aria-live="polite"></div>
+  <div class="mctl" hidden>
+    <button id="mPrev" type="button" aria-label="Canción anterior" title="Canción anterior"><svg viewBox="0 0 24 24" width="22" height="22" fill="currentColor" aria-hidden="true"><path d="M6 5h2v14H6zM20 5v14L9 12z"/></svg></button>
+    <button id="mNext" type="button" aria-label="Siguiente canción" title="Siguiente canción"><svg viewBox="0 0 24 24" width="22" height="22" fill="currentColor" aria-hidden="true"><path d="M16 5h2v14h-2zM4 5v14l11-7z"/></svg></button>
+    <input id="mVol" type="range" min="0" max="100" value="35" aria-label="Volumen" title="Volumen">
+  </div>
 </section>
 
 <section class="tools" id="tools">
@@ -309,7 +321,7 @@
   <div class="layers glass">
     <button class="layer est on" data-l="est"><i></i>Estudiantes</button>
     <button class="layer doc on" data-l="doc"><i></i><span class="lg">Equipo y docentes</span><span class="sh">Equipo</span></button>
-    <button class="layer pel on" data-l="pel"><i></i><span class="lg">Selección oficial · Festival</span><span class="sh">Películas</span></button>
+    <button class="layer pel on" data-l="pel" title="Selección oficial del Festival"><i></i><span class="lg">Selección oficial · Festival</span><span class="sh">Películas</span></button>
   </div>
   <div class="subfilters glass">
     <button class="mini on" data-p="Residencia">Residencia</button>
@@ -803,13 +815,15 @@ render();
    Archivos en la carpeta musica/. Con la lista vacía el botón no aparece. */
 (function () {
   const MUSICA = [{s:"musica/pista-01.mp3",t:"Canajagua azul",a:"Paris Vasquez"},{s:"musica/pista-02.mp3",t:"Aires santeños",a:"Tradicional"},{s:"musica/pista-03.mp3",t:"La viudita de la miel",a:"Artemio Vargas"},{s:"musica/pista-04.mp3",t:"La flor de Liola",a:"Toñito Saenz"},{s:"musica/pista-05.mp3",t:"Me voy de Padasi",a:"Casimiro Pimentel"},{s:"musica/pista-06.mp3",t:"A Chitre",a:"Alberto Rodriguez"},{s:"musica/pista-07.mp3",t:"Sinceridad",a:"Toñito Saenz"},{s:"musica/pista-08.mp3",t:"Todo en la vida pasa",a:"Colaco Cortez"},{s:"musica/pista-09.mp3",t:"La espigadilla",a:"Gelo Cordoba"},{s:"musica/pista-10.mp3",t:"Pica pica",a:"Gelo Cordoba"},{s:"musica/pista-11.mp3",t:"Rascate",a:"D.R.A."},{s:"musica/pista-12.mp3",t:"Arroz con mango",a:"Colaco Cortez"},{s:"musica/pista-13.mp3",t:"El bandido",a:"D.R.A."},{s:"musica/pista-14.mp3",t:"Amor lindo",a:"Jose de la Rosa Cedeño"},{s:"musica/pista-15.mp3",t:"Mogollon",a:"Sacramento Cordoba"}];  // colección de música tradicional (Gelo Córdoba); títulos y autores tal como vienen en los archivos
-  const VOL = 0.35, KEY = 'acampadoc-musica';
+  let VOL = 0.35; const KEY = 'acampadoc-musica';
   const btn = document.getElementById('musica');
   if (!btn || !MUSICA.length) return;
+  const ctl = document.querySelector('.mctl'), vol = document.getElementById('mVol');
   const txt = btn.querySelector('.mtxt'), cred = btn.querySelector('.mcred'), now = document.querySelector('.mnow');
   const audio = new Audio(); audio.preload = 'none'; audio.volume = 0; audio.loop = MUSICA.length === 1;
   let pista = Math.floor(Math.random() * MUSICA.length), cargada = false, quiere = true, fade = 0, ctx = null, gain = null, arrancando = false;
-  try { quiere = localStorage.getItem(KEY) !== 'off'; } catch (e) {}
+  try { quiere = localStorage.getItem(KEY) !== 'off'; const v = parseFloat(localStorage.getItem(KEY + '-vol')); if (v >= 0 && v <= 1) VOL = v; } catch (e) {}
+  vol.value = Math.round(VOL * 100);
   const guardar = v => { try { localStorage.setItem(KEY, v ? 'on' : 'off'); } catch (e) {} };
   const pintar = () => {
     const on = !audio.paused, tema = MUSICA[pista].t + ' · ' + MUSICA[pista].a;
@@ -817,6 +831,7 @@ render();
     btn.classList.toggle('espera', !on && quiere && !cargada);
     txt.textContent = on ? 'Silenciar música' : 'Activar música';
     btn.setAttribute('aria-label', txt.textContent); btn.title = txt.textContent;
+    ctl.hidden = !cargada;
     cred.textContent = on ? '♪ ' + tema : ''; if (now) now.textContent = on ? '♪ ' + tema : '';
   };
   /* iPhone ignora audio.volume: el volumen se controla con Web Audio cuando existe */
@@ -842,6 +857,10 @@ render();
   const parar = () => volumen(0, 400, () => { audio.pause(); pintar(); });
   audio.addEventListener('ended', () => { pista = (pista + 1) % MUSICA.length; audio.src = MUSICA[pista].s; sonar(); });
   audio.addEventListener('play', pintar); audio.addEventListener('pause', pintar);
+  const cambiar = d => { pista = (pista + d + MUSICA.length) % MUSICA.length; audio.src = MUSICA[pista].s; cargada = true; quiere = true; guardar(true); audio.loop = false; sonar(); };
+  document.getElementById('mPrev').addEventListener('click', e => { e.stopPropagation(); cambiar(-1); });
+  document.getElementById('mNext').addEventListener('click', e => { e.stopPropagation(); cambiar(1); });
+  vol.addEventListener('input', () => { VOL = vol.value / 100; clearInterval(fade); if (!audio.paused) poner(VOL); try { localStorage.setItem(KEY + '-vol', String(VOL)); } catch (e) {} });
   btn.hidden = false; pintar();
   btn.addEventListener('click', e => { e.stopPropagation(); if (audio.paused) { quiere = true; guardar(true); sonar(); } else { quiere = false; guardar(false); parar(); } });
   /* en celular solo cuentan como permiso del navegador el toque terminado (touchend/pointerup/click) o una tecla; no el scroll ni el inicio del toque */
