@@ -821,18 +821,18 @@ render();
   const ctl = document.querySelector('.mctl'), vol = document.getElementById('mVol');
   const txt = btn.querySelector('.mtxt'), cred = btn.querySelector('.mcred'), now = document.querySelector('.mnow');
   const audio = new Audio(); audio.preload = 'none'; audio.volume = 0; audio.loop = MUSICA.length === 1;
-  let pista = Math.floor(Math.random() * MUSICA.length), cargada = false, quiere = true, fade = 0, ctx = null, gain = null, arrancando = false;
+  let pista = Math.floor(Math.random() * MUSICA.length), cargada = false, quiere = true, fade = 0, ctx = null, gain = null, tok = 0, fallos = 0;
   try { quiere = localStorage.getItem(KEY) !== 'off'; const v = parseFloat(localStorage.getItem(KEY + '-vol')); if (v >= 0 && v <= 1) VOL = v; } catch (e) {}
   vol.value = Math.round(VOL * 100);
   const guardar = v => { try { localStorage.setItem(KEY, v ? 'on' : 'off'); } catch (e) {} };
   const pintar = () => {
-    const on = !audio.paused, tema = MUSICA[pista].t + ' · ' + MUSICA[pista].a;
+    const on = !audio.paused, tema = on ? '♪ ' + MUSICA[pista].t + ' · álbum de Gelo Córdoba' : 'Música: álbum de Gelo Córdoba';
     btn.classList.toggle('sonando', on); btn.setAttribute('aria-pressed', String(on));
     btn.classList.toggle('espera', !on && quiere && !cargada);
     txt.textContent = on ? 'Silenciar música' : 'Activar música';
     btn.setAttribute('aria-label', txt.textContent); btn.title = txt.textContent;
     ctl.hidden = !cargada;
-    cred.textContent = on ? '♪ ' + tema : ''; if (now) now.textContent = on ? '♪ ' + tema : '';
+    cred.textContent = tema; if (now) now.textContent = tema;
   };
   /* iPhone ignora audio.volume: el volumen se controla con Web Audio cuando existe */
   const preparar = () => {
@@ -844,18 +844,19 @@ render();
   const poner = v => { if (gain) gain.gain.value = v; else audio.volume = v; };
   const volumen = (a, ms, fin) => { clearInterval(fade); const v0 = nivel(), t0 = performance.now();
     fade = setInterval(() => { const k = Math.min(1, (performance.now() - t0) / ms); poner(v0 + (a - v0) * k); if (k >= 1) { clearInterval(fade); fin && fin(); } }, 50); };
+  /* cada llamada tiene un número: si el visitante cambia de canción rápido, solo la última cuenta (antes quedaba trabado) */
   const sonar = () => {
-    if (arrancando) return Promise.resolve(false);
-    arrancando = true; preparar();
+    const mi = ++tok; preparar();
     if (!cargada) { audio.src = MUSICA[pista].s; cargada = true; }
     if (ctx && ctx.state === 'suspended') { try { ctx.resume(); } catch (e) {} }
     poner(0);
     const p = audio.play();
-    return (p && p.then ? p : Promise.resolve()).then(() => { volumen(VOL, 700); arrancando = false; pintar(); return true; })
-      .catch(() => { arrancando = false; pintar(); return false; });
+    return (p && p.then ? p : Promise.resolve()).then(() => { if (mi === tok) { fallos = 0; volumen(VOL, 500); } pintar(); return true; })
+      .catch(() => { if (mi === tok) pintar(); return false; });
   };
   const parar = () => volumen(0, 400, () => { audio.pause(); pintar(); });
   audio.addEventListener('ended', () => { pista = (pista + 1) % MUSICA.length; audio.src = MUSICA[pista].s; sonar(); });
+  audio.addEventListener('error', () => { if (++fallos < MUSICA.length) cambiar(1); });
   audio.addEventListener('play', pintar); audio.addEventListener('pause', pintar);
   const cambiar = d => { pista = (pista + d + MUSICA.length) % MUSICA.length; audio.src = MUSICA[pista].s; cargada = true; quiere = true; guardar(true); audio.loop = false; sonar(); };
   document.getElementById('mPrev').addEventListener('click', e => { e.stopPropagation(); cambiar(-1); });
