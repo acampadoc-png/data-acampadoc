@@ -58,6 +58,7 @@
   .layer { flex: 1; border: 1px solid var(--line); background: transparent; border-radius: 12px; padding: 8px 4px; cursor: pointer; font-size: 11.5px; font-weight: 600;
     display: flex; align-items: center; justify-content: center; gap: 6px; color: var(--muted); transition: all .2s; white-space: nowrap; }
   .layer i { width: 9px; height: 9px; border-radius: 50%; flex: 0 0 9px; }
+  .layer .sh { display: none; }
   .layer.on { color: var(--text); background: rgba(252,246,219,.07); }
   .layer.est i { background: var(--est); } .layer.doc i { background: var(--doc); } .layer.pel i { background: var(--pel); }
   .layer.on i { box-shadow: 0 0 10px currentColor; }
@@ -169,6 +170,22 @@
   .sedeinfo { padding: 12px 10px 4px; font-size: 13px; line-height: 1.5; color: var(--muted); }
   .sedeinfo b { color: var(--text); }
 
+  /* ---------- música y botones del celular */
+  .musica { margin-top: 10px; width: 100%; display: flex; align-items: center; gap: 10px; min-height: 44px; padding: 8px 14px; border-radius: 12px; cursor: pointer;
+    border: 1px solid rgba(255,204,51,.45); background: rgba(255,204,51,.12); color: var(--text); font: 600 13px Inter, sans-serif; text-align: left; transition: background .2s, border-color .2s; }
+  .musica:hover, .musica:focus-visible { background: rgba(255,204,51,.22); border-color: var(--amarillo); outline: none; }
+  .musica[hidden] { display: none !important; }
+  .musica svg { width: 22px; height: 22px; flex: 0 0 22px; color: var(--amarillo); }
+  .musica .ic-on { display: none; } .musica.sonando .ic-on { display: block; } .musica.sonando .ic-off { display: none; }
+  .musica:not(.sonando) svg { color: var(--muted); }
+  .musica.espera { animation: mpulso 2.2s ease-out infinite; }
+  @keyframes mpulso { 0% { box-shadow: 0 0 0 0 rgba(255,204,51,.55); } 70%, 100% { box-shadow: 0 0 0 12px rgba(255,204,51,0); } }
+  .roundbtn, .mhint, .mnow, #buscarX { display: none; }
+  .musica .mcol { display: flex; flex-direction: column; min-width: 0; line-height: 1.25; }
+  .musica .mcred { font-weight: 500; font-size: 10.5px; color: var(--muted); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+  .musica .mcred:empty { display: none; }
+  @media (prefers-reduced-motion: reduce) { .musica.espera { animation: none; } }
+
   /* pantallas bajas (zoom alto del navegador, laptops pequeñas, celular horizontal): compactar para que todo quepa */
   @media (min-width: 761px) and (max-height: 820px) {
     .brand { padding: 10px 14px 12px; width: 310px; }
@@ -213,12 +230,46 @@
     .kpis { margin-top: 10px; }
     .kpi b { font-size: 16px; }
     .tools { top: auto; bottom: 168px; left: 12px; right: 12px; width: auto; }
-    .search, .subfilters { display: none; }
+    .subfilters { display: none; }
     .timeline { bottom: 12px; width: calc(100% - 24px); padding: 10px 10px 8px; }
     .bars { height: 74px; gap: 3px; }
     .bar .n { font-size: 9px; } .bar .y { font-size: 9px; }
     .tl-note, #tlHint { display: none; }
     #panel { left: 12px; right: 12px; width: auto; top: auto; bottom: 12px; max-height: 62vh; z-index: 12 !important; }
+    /* ---- celular: cabecera compacta, botones de buscar y música, toques de 44 px, textos legibles */
+    .brand { top: max(12px, env(safe-area-inset-top)); left: max(12px, env(safe-area-inset-left)); right: max(12px, env(safe-area-inset-right)); }
+    .brand .top { padding-right: 104px; min-height: 44px; }
+    .brand h1 { font-size: 16px; }
+    .mhint { display: block; margin: 8px 2px 0; font-size: 12.5px; line-height: 1.35; color: var(--muted); }
+    .kpi small { font-size: 10px; }
+    .roundbtn { display: grid; place-items: center; position: absolute; top: 10px; right: 62px; width: 44px; height: 44px; border-radius: 50%; cursor: pointer; padding: 0;
+      border: 1px solid var(--line); background: rgba(252,246,219,.08); color: var(--text); }
+    .musica { position: absolute; top: 10px; right: 12px; width: 44px; min-height: 44px; height: 44px; margin: 0; padding: 0; border-radius: 50%; justify-content: center; gap: 0; }
+    .musica .mcol { display: none; }
+    .mnow { display: block; margin: 6px 2px 0; font-size: 11.5px; color: var(--amarillo); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+    .mnow:empty { display: none; }
+    .layers { gap: 4px; }
+    .layer { min-height: 44px; padding: 6px 2px; font-size: 12.5px; gap: 5px; }
+    .layer .lg { display: none; } .layer .sh { display: inline; }
+    .badge.compact .ring { width: 28px; height: 28px; flex-basis: 28px; } .badge.compact .ring span { width: 21px; height: 21px; font-size: 11px; }
+    .search { display: none; position: fixed; top: max(12px, env(safe-area-inset-top)); left: 12px; right: 12px; z-index: 25; padding: 6px 8px; }
+    body.buscando .search { display: block; }
+    .search .srow { display: flex; align-items: center; gap: 8px; }
+    .search input { font-size: 16px; padding: 12px 8px; min-width: 0; flex: 1; }
+    #buscarX { display: block; flex: 0 0 auto; min-height: 44px; padding: 0 12px; border: 0; background: transparent; color: var(--amarillo); font: 700 14px Inter, sans-serif; cursor: pointer; }
+    #results { max-height: 55vh; max-height: 55dvh; }
+    #results div { padding: 13px 10px; font-size: 15px; }
+    #panel { max-height: 68vh; max-height: 68dvh; bottom: max(12px, env(safe-area-inset-bottom)); }
+    #panel .head { padding-top: 22px; }
+    #panel .head::before { content: ""; position: absolute; top: 8px; left: 50%; width: 40px; height: 4px; margin-left: -20px; border-radius: 2px; background: rgba(252,246,219,.28); }
+    #panel h2 { font-size: 21px; }
+    #panel .close { top: 10px; right: 4px; width: 44px; height: 44px; font-size: 30px; }
+    .tab { min-height: 44px; font-size: 13px; }
+    .item { padding: 10px 8px; }
+    .item .t { font-size: 15px; } .item .m { font-size: 12.5px; } .item .pr { font-size: 12.5px; }
+    .vimeo { padding: 9px 14px; font-size: 13px; }
+    .timeline { bottom: max(12px, env(safe-area-inset-bottom)); }
+    #player .plbar button { min-width: 44px; min-height: 44px; }
   }
 </style>
 </head>
@@ -234,27 +285,31 @@
     </div>
   </div>
   <p>Estudiantes y equipo docente de la escuela ACAMPADOC, y las películas de la <b>Selección Oficial del Festival</b> (en rojo; no son cortos de estudiantes). Todos los caminos llevan a <b>La Villa de Los Santos, Panamá</b>. Gira el planeta y toca un país.</p>
+  <div class="mhint">Toca un país para ver a su gente y sus películas.</div>
   <div class="kpis">
     <div class="kpi est"><b id="kEst">0</b><small>Estudiantes</small></div>
     <div class="kpi doc"><b id="kDoc">0</b><small>Equipo y doc.</small></div>
     <div class="kpi pel"><b id="kPel">0</b><small>Pelis festival</small></div>
     <div class="kpi"><b id="kPai">0</b><small>Países</small></div>
   </div>
+  <button id="btnBuscar" class="roundbtn" type="button" aria-label="Buscar persona, película o país"><svg viewBox="0 0 24 24" width="22" height="22" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" aria-hidden="true"><circle cx="10.5" cy="10.5" r="6.5"/><path d="M15.5 15.5 21 21"/></svg></button>
   <button id="musica" class="musica" type="button" hidden aria-pressed="false">
-    <span class="eq" aria-hidden="true"><i></i><i></i><i></i></span>
+    <svg class="ic-off" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M4 9.5v5h3.5L12 18.5v-13L7.5 9.5z" fill="currentColor"/><path d="m16 9.5 5 5M21 9.5l-5 5"/></svg>
+    <svg class="ic-on" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M4 9.5v5h3.5L12 18.5v-13L7.5 9.5z" fill="currentColor"/><path d="M15.5 9a4.2 4.2 0 0 1 0 6M18.3 6.5a8 8 0 0 1 0 11"/></svg>
     <span class="mcol"><span class="mtxt">Activar música</span><small class="mcred"></small></span>
   </button>
+  <div class="mnow" aria-live="polite"></div>
 </section>
 
 <section class="tools" id="tools">
   <div class="search glass">
-    <input id="q" type="search" placeholder="Buscar persona, película, ciudad o país…" autocomplete="off" aria-label="Buscar">
+    <div class="srow"><input id="q" type="search" placeholder="Buscar persona, película, ciudad o país…" autocomplete="off" aria-label="Buscar"><button id="buscarX" type="button" aria-label="Cerrar búsqueda">Cerrar</button></div>
     <div id="results"></div>
   </div>
   <div class="layers glass">
     <button class="layer est on" data-l="est"><i></i>Estudiantes</button>
-    <button class="layer doc on" data-l="doc"><i></i>Equipo y docentes</button>
-    <button class="layer pel on" data-l="pel"><i></i>Selección oficial · Festival</button>
+    <button class="layer doc on" data-l="doc"><i></i><span class="lg">Equipo y docentes</span><span class="sh">Equipo</span></button>
+    <button class="layer pel on" data-l="pel"><i></i><span class="lg">Selección oficial · Festival</span><span class="sh">Películas</span></button>
   </div>
   <div class="subfilters glass">
     <button class="mini on" data-p="Residencia">Residencia</button>
@@ -289,22 +344,6 @@
   </div>
 </div>
 
-<style id="musica-css">
-  .musica { margin-top: 10px; width: 100%; display: flex; align-items: center; gap: 10px; min-height: 44px; padding: 8px 14px; border-radius: 12px; cursor: pointer;
-    border: 1px solid rgba(255,204,51,.45); background: rgba(255,204,51,.12); color: var(--text); font: 600 13px Inter, sans-serif; text-align: left; transition: background .2s, border-color .2s; }
-  .musica:hover, .musica:focus-visible { background: rgba(255,204,51,.22); border-color: var(--amarillo); outline: none; }
-  .musica[hidden] { display: none !important; }
-  .musica .eq { display: inline-flex; align-items: flex-end; gap: 2px; width: 16px; height: 16px; flex: 0 0 16px; }
-  .musica .eq i { flex: 1; height: 30%; background: var(--amarillo); border-radius: 1px; }
-  .musica.sonando .eq i { animation: eq .9s ease-in-out infinite; }
-  .musica.sonando .eq i:nth-child(2) { animation-delay: .25s; } .musica.sonando .eq i:nth-child(3) { animation-delay: .5s; }
-  .musica:not(.sonando) .eq i { background: var(--muted); }
-  @keyframes eq { 0%, 100% { height: 25%; } 50% { height: 100%; } }
-  .musica .mcol { display: flex; flex-direction: column; min-width: 0; line-height: 1.25; }
-  .musica .mcred { font-weight: 500; font-size: 10.5px; color: var(--muted); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
-  .musica .mcred:empty { display: none; }
-  @media (prefers-reduced-motion: reduce) { .musica.sonando .eq i { animation: none; height: 70%; } }
-</style>
 <script src="https://cdn.jsdelivr.net/npm/topojson-client@3.1.0/dist/topojson-client.min.js"></script>
 <script src="https://cdn.jsdelivr.net/npm/globe.gl@2.33.1/dist/globe.gl.min.js"></script>
 <script>
@@ -376,7 +415,7 @@ const total = c => c.est.length + c.doc.length + c.pel.length;
 const mainLayer = c => [['est', c.est.length], ['doc', c.doc.length], ['pel', c.pel.length]].sort((a, b) => b[1] - a[1])[0][0];
 
 // ------------------------------------------------------------------ globo
-const BASE_ALT = 2.3;
+const BASE_ALT = innerWidth < 760 ? 3.4 : 2.3;
 // celulares y tabletas: menos resolución, menos arcos y etiquetas; sin animación si el sistema pide reducir movimiento
 const LITE = matchMedia('(max-width: 760px), (pointer: coarse)').matches;
 const CALM = matchMedia('(prefers-reduced-motion: reduce)').matches;
@@ -507,7 +546,7 @@ function layoutBadges() {
     const w = FULL_W.get(e);
     const full = { left: cx - w / 2, right: cx + w / 2, top: cy - 16, bottom: cy + 16 };
     const small = { left: cx - 15, right: cx + 15, top: cy - 15, bottom: cy + 15 };
-    const compact = tot < (e._cut || 0) || placed.some(p => overlap(full, p));
+    const compact = innerWidth < 760 || tot < (e._cut || 0) || placed.some(p => overlap(full, p));
     e.classList.toggle('compact', compact);
     e.style.zIndex = compact ? 1 : 2;
     placed.push(compact ? small : full);
@@ -608,7 +647,7 @@ function fillCountry(pa) {
   if (!c[tab].length) tab = c.est.length ? 'est' : c.doc.length ? 'doc' : 'pel';
   const tabs = document.getElementById('tabs');
   tabs.innerHTML = '';
-  [['est', 'Estudiantes', c.est.length], ['doc', 'Equipo y docentes', nDoc], ['pel', 'Festival (selección oficial)', c.pel.length]].forEach(([l, t, n]) => {
+  [['est', 'Estudiantes', c.est.length], ['doc', innerWidth < 760 ? 'Equipo' : 'Equipo y docentes', nDoc], ['pel', innerWidth < 760 ? 'Festival' : 'Festival (selección oficial)', c.pel.length]].forEach(([l, t, n]) => {
     if (!n) return;
     const b = document.createElement('button');
     b.className = `tab ${l}` + (tab === l ? ' on' : '');
@@ -760,41 +799,79 @@ q.oninput = () => {
 render();
 </script>
 <script>
-/* Música de fondo. Ligera: el audio NO se descarga hasta el primer gesto del visitante (toque, clic, tecla o scroll) y se carga una pista a la vez.
-   Para activarla, listar los archivos en MUSICA (rutas relativas, carpeta musica/). Con la lista vacía el botón no aparece. */
+/* Música de fondo. Ligera: el audio NO se descarga hasta el primer toque o clic del visitante y se carga una pista a la vez.
+   Archivos en la carpeta musica/. Con la lista vacía el botón no aparece. */
 (function () {
   const MUSICA = [{s:"musica/pista-01.mp3",t:"Canajagua azul",a:"Paris Vasquez"},{s:"musica/pista-02.mp3",t:"Aires santeños",a:"Tradicional"},{s:"musica/pista-03.mp3",t:"La viudita de la miel",a:"Artemio Vargas"},{s:"musica/pista-04.mp3",t:"La flor de Liola",a:"Toñito Saenz"},{s:"musica/pista-05.mp3",t:"Me voy de Padasi",a:"Casimiro Pimentel"},{s:"musica/pista-06.mp3",t:"A Chitre",a:"Alberto Rodriguez"},{s:"musica/pista-07.mp3",t:"Sinceridad",a:"Toñito Saenz"},{s:"musica/pista-08.mp3",t:"Todo en la vida pasa",a:"Colaco Cortez"},{s:"musica/pista-09.mp3",t:"La espigadilla",a:"Gelo Cordoba"},{s:"musica/pista-10.mp3",t:"Pica pica",a:"Gelo Cordoba"},{s:"musica/pista-11.mp3",t:"Rascate",a:"D.R.A."},{s:"musica/pista-12.mp3",t:"Arroz con mango",a:"Colaco Cortez"},{s:"musica/pista-13.mp3",t:"El bandido",a:"D.R.A."},{s:"musica/pista-14.mp3",t:"Amor lindo",a:"Jose de la Rosa Cedeño"},{s:"musica/pista-15.mp3",t:"Mogollon",a:"Sacramento Cordoba"}];  // colección de música tradicional (Gelo Córdoba); títulos y autores tal como vienen en los archivos
   const VOL = 0.35, KEY = 'acampadoc-musica';
   const btn = document.getElementById('musica');
   if (!btn || !MUSICA.length) return;
-  const txt = btn.querySelector('.mtxt'), cred = btn.querySelector('.mcred');
+  const txt = btn.querySelector('.mtxt'), cred = btn.querySelector('.mcred'), now = document.querySelector('.mnow');
   const audio = new Audio(); audio.preload = 'none'; audio.volume = 0; audio.loop = MUSICA.length === 1;
-  let pista = Math.floor(Math.random() * MUSICA.length), cargada = false, quiere = true, fade = 0;
+  let pista = Math.floor(Math.random() * MUSICA.length), cargada = false, quiere = true, fade = 0, ctx = null, gain = null, arrancando = false;
   try { quiere = localStorage.getItem(KEY) !== 'off'; } catch (e) {}
   const guardar = v => { try { localStorage.setItem(KEY, v ? 'on' : 'off'); } catch (e) {} };
   const pintar = () => {
-    const on = !audio.paused;
-    cred.textContent = on ? '♪ ' + MUSICA[pista].t + ' · ' + MUSICA[pista].a : '';
+    const on = !audio.paused, tema = MUSICA[pista].t + ' · ' + MUSICA[pista].a;
     btn.classList.toggle('sonando', on); btn.setAttribute('aria-pressed', String(on));
+    btn.classList.toggle('espera', !on && quiere && !cargada);
     txt.textContent = on ? 'Silenciar música' : 'Activar música';
-    btn.setAttribute('aria-label', txt.textContent);
+    btn.setAttribute('aria-label', txt.textContent); btn.title = txt.textContent;
+    cred.textContent = on ? '♪ ' + tema : ''; if (now) now.textContent = on ? '♪ ' + tema : '';
   };
-  const volumen = (a, ms, fin) => { clearInterval(fade); const v0 = audio.volume, t0 = performance.now();
-    fade = setInterval(() => { const k = Math.min(1, (performance.now() - t0) / ms); audio.volume = v0 + (a - v0) * k; if (k >= 1) { clearInterval(fade); fin && fin(); } }, 50); };
+  /* iPhone ignora audio.volume: el volumen se controla con Web Audio cuando existe */
+  const preparar = () => {
+    if (ctx || !(window.AudioContext || window.webkitAudioContext)) return;
+    try { ctx = new (window.AudioContext || window.webkitAudioContext)(); const src = ctx.createMediaElementSource(audio);
+      gain = ctx.createGain(); gain.gain.value = 0; src.connect(gain); gain.connect(ctx.destination); audio.volume = 1; } catch (e) { ctx = null; gain = null; }
+  };
+  const nivel = () => gain ? gain.gain.value : audio.volume;
+  const poner = v => { if (gain) gain.gain.value = v; else audio.volume = v; };
+  const volumen = (a, ms, fin) => { clearInterval(fade); const v0 = nivel(), t0 = performance.now();
+    fade = setInterval(() => { const k = Math.min(1, (performance.now() - t0) / ms); poner(v0 + (a - v0) * k); if (k >= 1) { clearInterval(fade); fin && fin(); } }, 50); };
   const sonar = () => {
+    if (arrancando) return Promise.resolve(false);
+    arrancando = true; preparar();
     if (!cargada) { audio.src = MUSICA[pista].s; cargada = true; }
-    const p = audio.play(); audio.volume = 0;
-    (p && p.then ? p : Promise.resolve()).then(() => { volumen(VOL, 700); pintar(); }).catch(() => pintar());
+    if (ctx && ctx.state === 'suspended') { try { ctx.resume(); } catch (e) {} }
+    poner(0);
+    const p = audio.play();
+    return (p && p.then ? p : Promise.resolve()).then(() => { volumen(VOL, 700); arrancando = false; pintar(); return true; })
+      .catch(() => { arrancando = false; pintar(); return false; });
   };
   const parar = () => volumen(0, 400, () => { audio.pause(); pintar(); });
   audio.addEventListener('ended', () => { pista = (pista + 1) % MUSICA.length; audio.src = MUSICA[pista].s; sonar(); });
   audio.addEventListener('play', pintar); audio.addEventListener('pause', pintar);
   btn.hidden = false; pintar();
   btn.addEventListener('click', e => { e.stopPropagation(); if (audio.paused) { quiere = true; guardar(true); sonar(); } else { quiere = false; guardar(false); parar(); } });
-  const EV = ['pointerdown', 'touchstart', 'keydown', 'wheel'];
-  const primero = e => { if (e.target && e.target.nodeType && btn.contains(e.target)) return; EV.forEach(n => removeEventListener(n, primero, true)); if (quiere && audio.paused) sonar(); };
+  /* en celular solo cuentan como permiso del navegador el toque terminado (touchend/pointerup/click) o una tecla; no el scroll ni el inicio del toque */
+  const EV = ['pointerup', 'touchend', 'click', 'keydown'];
+  const quitar = () => EV.forEach(n => removeEventListener(n, primero, true));
+  const primero = e => {
+    if (e.target && e.target.nodeType && btn.contains(e.target)) return;
+    if (!quiere) { quitar(); return; }
+    if (audio.paused) sonar().then(ok => { if (ok) quitar(); });
+  };
   EV.forEach(n => addEventListener(n, primero, { capture: true, passive: true }));
   document.addEventListener('visibilitychange', () => { if (!cargada) return; if (document.hidden) audio.pause(); else if (quiere) sonar(); });
+})();
+</script>
+<script>
+/* Interfaz de celular: buscador desplegable y deslizar el panel hacia abajo para cerrarlo */
+(function () {
+  try {
+    const b = document.getElementById('btnBuscar'), x = document.getElementById('buscarX'), qi = document.getElementById('q'), res = document.getElementById('results');
+    const abrir = () => { document.body.classList.add('buscando'); setTimeout(() => qi.focus(), 30); };
+    const cerrar = () => { document.body.classList.remove('buscando'); qi.blur(); qi.value = ''; res.innerHTML = ''; };
+    b.addEventListener('click', e => { e.stopPropagation(); abrir(); });
+    x.addEventListener('click', e => { e.stopPropagation(); cerrar(); });
+    res.addEventListener('click', () => document.body.classList.remove('buscando'));
+    addEventListener('keydown', e => { if (e.key === 'Escape') cerrar(); });
+    const pn = document.getElementById('panel'), hd = pn.querySelector('.head'); let y0 = null, dy = 0;
+    hd.addEventListener('touchstart', e => { y0 = e.touches[0].clientY; dy = 0; }, { passive: true });
+    hd.addEventListener('touchmove', e => { if (y0 === null) return; dy = e.touches[0].clientY - y0; if (dy > 0) pn.style.transform = 'translateY(' + dy + 'px)'; }, { passive: true });
+    hd.addEventListener('touchend', () => { pn.style.transform = ''; if (y0 !== null && dy > 70) closePanel(); y0 = null; });
+  } catch (e) {}
 })();
 </script>
 </body>
