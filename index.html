@@ -792,7 +792,7 @@ render();
   btn.hidden = false; pintar();
   btn.addEventListener('click', e => { e.stopPropagation(); if (audio.paused) { quiere = true; guardar(true); sonar(); } else { quiere = false; guardar(false); parar(); } });
   const EV = ['pointerdown', 'touchstart', 'keydown', 'wheel'];
-  const primero = e => { if (btn.contains(e.target)) return; EV.forEach(n => removeEventListener(n, primero, true)); if (quiere && audio.paused) sonar(); };
+  const primero = e => { if (e.target && e.target.nodeType && btn.contains(e.target)) return; EV.forEach(n => removeEventListener(n, primero, true)); if (quiere && audio.paused) sonar(); };
   EV.forEach(n => addEventListener(n, primero, { capture: true, passive: true }));
   document.addEventListener('visibilitychange', () => { if (!cargada) return; if (document.hidden) audio.pause(); else if (quiere) sonar(); });
 })();
