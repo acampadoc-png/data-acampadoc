@@ -280,10 +280,10 @@
   }
 
   /* ================= celular: todo plegable para que el globo se vea (oct 2026) ================= */
-  .btnmas, .tl-chev, .tl-mob, .grab { display: none; }
+  .btnmas, .tl-chev, .tl-mob, .grab, .mdesc { display: none; }
   @media (max-width: 760px) {
     /* --- cabecera: una píldora con logo, título, buscar, música y flecha para ver más */
-    .brand { padding: 8px 6px 8px 10px; border-radius: 22px; }
+    .brand { padding: 8px 6px 10px 10px; border-radius: 18px; }
     .brand .top { padding-right: 146px; min-height: 44px; gap: 9px; }
     .brand .top > div { min-width: 0; }
     .brand .logo { width: 38px; height: 38px; flex-basis: 38px; }
@@ -295,9 +295,14 @@
     .btnmas { display: grid; place-items: center; position: absolute; top: 6px; right: 6px; width: 44px; height: 44px; border-radius: 50%; padding: 0; cursor: pointer;
       border: 1px solid var(--line); background: rgba(252,246,219,.08); color: var(--text); }
     .btnmas svg, .tl-chev svg { transition: transform .25s; }
-    body:not(.cab) .brand .mhint, body:not(.cab) .brand .kpis, body:not(.cab) .brand .mctl, body:not(.cab) .brand .mnow { display: none !important; }
+    .mdesc { display: block; margin: 8px 2px 0; font-size: 13px; line-height: 1.35; color: var(--crema); opacity: .85; }
+    .brand .kpis { margin-top: 8px; gap: 5px; }
+    .kpi { padding: 7px 6px 6px; }
+    .kpi b { font-size: 18px; }
+    .kpi small { font-size: 9.5px; letter-spacing: .03em; }
+    body:not(.cab) .brand .mhint, body:not(.cab) .brand .mctl, body:not(.cab) .brand .mnow { display: none !important; }
     /* mientras suena la música, el crédito a Gelo Córdoba sigue a la vista aunque la cabecera esté plegada */
-    body:not(.cab) .brand:has(.musica.sonando) .mnow { display: block !important; margin: 4px 6px 3px; font-size: 11px; }
+    body:not(.cab) .brand:has(.musica.sonando) .mnow { display: block !important; margin: 6px 2px 0; font-size: 11.5px; }
     body.cab .brand { padding: 10px 12px 12px; border-radius: 18px; }
     body.cab .brand h1 { font-size: 17px; }
     body.cab .roundbtn, body.cab .musica, body.cab .btnmas { top: 10px; }
@@ -354,8 +359,9 @@
       <h1>Una comunidad que recorre el mundo</h1>
     </div>
   </div>
-  <button id="btnMas" class="btnmas" type="button" aria-expanded="false" aria-label="Ver presentación, cifras y controles de música"><svg viewBox="0 0 24 24" width="20" height="20" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="m6 9 6 6 6-6"/></svg></button>
+  <button id="btnMas" class="btnmas" type="button" aria-expanded="false" aria-label="Ver ayuda y controles de música"><svg viewBox="0 0 24 24" width="20" height="20" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="m6 9 6 6 6-6"/></svg></button>
   <p>Estudiantes y equipo docente de la escuela ACAMPADOC, y las películas de la <b>Selección Oficial del Festival</b> (en rojo; no son cortos de estudiantes). Todos los caminos llevan a <b>La Villa de Los Santos, Panamá</b>. Gira el planeta y toca un país.</p>
+  <div class="mdesc">Escuela y festival de cine documental en La Villa de Los Santos, Panamá.</div>
   <div class="mhint">Toca un país para ver a su gente y sus películas.</div>
   <div class="kpis">
     <div class="kpi est"><b id="kEst">0</b><small>Estudiantes</small></div>
@@ -900,7 +906,7 @@ render();
   const guardar = v => { try { localStorage.setItem(KEY, v ? 'on' : 'off'); } catch (e) {} };
   const pintar = () => {
     const m = MUSICA[pista], comp = m.a && m.a !== 'D.R.A.' && m.a !== 'Gelo Cordoba' ? ' (' + m.a + ')' : '';
-    const on = !audio.paused, tema = on ? '♪ ' + m.t + comp + ' · Acordeón de Gelo Córdoba, patrimonio musical de Panamá' : 'Acordeón de Gelo Córdoba (Mogollón, Los Santos), maestro del patrimonio musical de Panamá';
+    const on = !audio.paused, tema = on ? '♪ Música de Gelo Córdoba' : 'Música de Gelo Córdoba';
     btn.classList.toggle('sonando', on); btn.setAttribute('aria-pressed', String(on));
     btn.classList.toggle('espera', !on && quiere && !cargada);
     txt.textContent = on ? 'Silenciar música' : 'Activar música';
