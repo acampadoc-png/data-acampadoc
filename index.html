@@ -280,7 +280,7 @@
   }
 
   /* ================= celular: todo plegable para que el globo se vea (oct 2026) ================= */
-  .btnmas, .tl-chev, .tl-mob, .grab, .mdesc { display: none; }
+  .btnmas, .tl-chev, .tl-mob, .grab, .mdesc, .kpi .sk { display: none; }
   @media (max-width: 760px) {
     /* --- cabecera: una píldora con logo, título, buscar, música y flecha para ver más */
     .brand { padding: 8px 6px 10px 10px; border-radius: 18px; }
@@ -346,6 +346,26 @@
     #panel.mini .head { border-bottom: 0; padding-bottom: 14px; }
     body.panel-open .timeline, body.panel-open .tools .layers, body.panel-open .tools .subfilters { display: none !important; }
   }
+
+  /* ================= celular: cabecera compacta por defecto; la flecha la amplía (oct 2026) ================= */
+  @media (max-width: 760px) {
+    body:not(.cab) .brand { padding: 6px 6px 8px 8px; border-radius: 16px; }
+    body:not(.cab) .brand .top { padding-right: 132px; min-height: 40px; gap: 8px; }
+    body:not(.cab) .brand .logo { width: 34px; height: 34px; flex-basis: 34px; }
+    body:not(.cab) .brand .kicker { font-size: 8.5px; letter-spacing: .12em; white-space: nowrap; }
+    body:not(.cab) .brand h1 { font-size: 13.5px; line-height: 1.18; margin-top: 1px; }
+    body:not(.cab) .roundbtn, body:not(.cab) .musica, body:not(.cab) .btnmas { top: 6px; width: 38px; height: 38px; min-height: 38px; }
+    body:not(.cab) .roundbtn svg, body:not(.cab) .musica svg { width: 18px; height: 18px; flex-basis: 18px; }
+    body:not(.cab) .btnmas { right: 6px; } body:not(.cab) .musica { right: 48px; } body:not(.cab) .roundbtn { right: 90px; }
+    body:not(.cab) .mdesc { margin: 5px 2px 0; font-size: 11.5px; line-height: 1.3; }
+    /* cifras en una sola fila, número y etiqueta lado a lado */
+    body:not(.cab) .brand .kpis { margin-top: 6px; gap: 4px; }
+    body:not(.cab) .kpi { padding: 5px 4px 4px; border-radius: 9px; text-align: center; }
+    body:not(.cab) .kpi b { font-size: 15px; line-height: 1.05; }
+    body:not(.cab) .kpi small { font-size: 8.5px; letter-spacing: .02em; margin-top: 1px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+    body:not(.cab) .brand:has(.musica.sonando) .mnow { margin: 5px 2px 0; font-size: 10.5px; }
+    body:not(.cab) .kpi .lk { display: none; } body:not(.cab) .kpi .sk { display: inline; }
+  }
 </style>
 </head>
 <body>
@@ -365,8 +385,8 @@
   <div class="mhint">Toca un país para ver a su gente y sus películas.</div>
   <div class="kpis">
     <div class="kpi est"><b id="kEst">0</b><small>Estudiantes</small></div>
-    <div class="kpi doc"><b id="kDoc">0</b><small>Equipo y doc.</small></div>
-    <div class="kpi pel"><b id="kPel">0</b><small>Pelis festival</small></div>
+    <div class="kpi doc"><b id="kDoc">0</b><small><span class="lk">Equipo y doc.</span><span class="sk">Equipo</span></small></div>
+    <div class="kpi pel"><b id="kPel">0</b><small><span class="lk">Pelis festival</span><span class="sk">Películas</span></small></div>
     <div class="kpi"><b id="kPai">0</b><small>Países</small></div>
   </div>
   <button id="btnBuscar" class="roundbtn" type="button" aria-label="Buscar persona, película o país"><svg viewBox="0 0 24 24" width="22" height="22" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" aria-hidden="true"><circle cx="10.5" cy="10.5" r="6.5"/><path d="M15.5 15.5 21 21"/></svg></button>
