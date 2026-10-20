@@ -18,6 +18,8 @@ Después de cualquier cambio: `python construir.py`, revisar, y subir `index.htm
 - **Pantalla de carga** con el logo; si el globo no puede cargar, lo dice y ofrece volver a intentar.
 - **Giro automático:** el planeta vuelve a girar solo tras 20 s sin que nadie lo toque.
 - **Un solo estilo en todas las pantallas:** computador, proyector y celular usan el diseño del celular (cabecera compacta, barra "Capas y años", ficha desde abajo). En pantallas anchas va en una columna de 420 px a la izquierda. Decisión de ACAMPADOC, 19 oct 2026; el modo proyección se descartó.
+- **Tema anual:** franja "TEMA 2026 · …" sobre la barra de abajo; cambia al tocar un año y enlaza a acampadoc.com/somos/temas. La ficha de la sede lista los temas (tocables) y la trayectoria. Al sumar un año nuevo, agregar su tema en `TEMAS` dentro de `plantilla.html`.
+- **Lema:** "Cine al rescate de los patrimonios" en la carga, la cabecera, la sede y el texto para compartir (#CineAlRescate).
 
 ## Música
 Las 15 pistas de `musica/` son interpretaciones del acordeonista **Gelo Córdoba** (Mogollón, Los Santos), figura del patrimonio musical de Panamá; el concurso de acordeón del Festival de Guararé lleva su nombre. Él compuso *La espigadilla* y *Pica pica*; los demás temas son de otros compositores (Paris Vásquez, Artemio Vargas, Toñito Sáenz, Casimiro Pimentel, Alberto Rodríguez, Colaco Cortez, José de la Rosa Cedeño, Sacramento Córdoba) o tradicionales. El reproductor muestra el nombre de la canción que suena y el crédito "Música de Gelo Córdoba" (decisión de ACAMPADOC, 19 oct 2026); no muestra compositores.
