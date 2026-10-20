@@ -7,7 +7,7 @@
 <meta name="description" content="Globo interactivo de la comunidad ACAMPADOC: estudiantes, equipo, docentes y películas del festival en el mundo.">
 <meta property="og:type" content="website">
 <meta property="og:title" content="Comunidad ACAMPADOC">
-<meta property="og:description" content="Estudiantes, equipo, docentes y películas del festival ACAMPADOC en el mundo. Todos los caminos llevan a La Villa de Los Santos, Panamá.">
+<meta property="og:description" content="Estudiantes, equipo, docentes y películas del festival ACAMPADOC en el mundo. Todos los caminos llevan a La Villa de Los Santos, Panamá. Cine al rescate de los patrimonios. #CineAlRescate">
 <meta property="og:image" content="https://www.acampadoc.com/wp-content/uploads/2026/03/cropped-logo_Acampadoc_rev2026_PROFILE_ICON.png">
 <link rel="icon" href="https://www.acampadoc.com/wp-content/uploads/2026/03/cropped-logo_Acampadoc_rev2026_PROFILE_ICON.png">
 <link rel="preconnect" href="https://fonts.googleapis.com">
@@ -180,6 +180,7 @@
   #cargando .cg-logo img { width: 84px; height: 84px; border-radius: 50%; display: block; }
   #cargando .cg-logo i { position: absolute; inset: -8px; border-radius: 50%; border: 3px solid rgba(255,204,51,.18); border-top-color: var(--amarillo); animation: giro 1s linear infinite; }
   #cargando b { font-size: 12px; letter-spacing: .22em; color: var(--amarillo); }
+  #cargando .cg-lema { font-size: 17px; font-style: italic; color: var(--crema); margin-bottom: 6px; }
   #cargando .cg-txt { font-size: 14px; color: var(--muted); max-width: 320px; line-height: 1.45; }
   #cargando button { display: none; margin-top: 8px; padding: 10px 18px; border-radius: 999px; border: 0; background: var(--amarillo); color: var(--cafe); font-weight: 700; cursor: pointer; }
   #cargando.fallo button { display: block; } #cargando.fallo .cg-logo i { display: none; }
@@ -263,6 +264,8 @@
 
   /* ================= celular: todo plegable para que el globo se vea (oct 2026) ================= */
   .btnmas, .tl-chev, .tl-mob, .grab, .mdesc, .kpi .sk { display: none; }
+  /* lema de ACAMPADOC, en su propia línea bajo la descripción */
+  .lema { display: block; margin-top: 3px; font-style: italic; font-weight: 600; color: var(--amarillo); opacity: 1; }
   @media all {
     /* --- cabecera: una píldora con logo, título, buscar, música y flecha para ver más */
     .brand { padding: 8px 6px 10px 10px; border-radius: 18px; }
@@ -362,6 +365,7 @@
 <div id="cargando" role="status" aria-live="polite">
   <div class="cg-logo"><img id="cgLogo" alt=""><i></i></div>
   <b>ACAMPADOC</b>
+  <em class="cg-lema">Cine al rescate de los patrimonios</em>
   <span class="cg-txt">Cargando la comunidad…</span>
   <button type="button" onclick="location.reload()">Volver a intentar</button>
 </div>
@@ -377,7 +381,7 @@
   </div>
   <button id="btnMas" class="btnmas" type="button" aria-expanded="false" aria-label="Ver ayuda y controles de música"><svg viewBox="0 0 24 24" width="20" height="20" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="m6 9 6 6 6-6"/></svg></button>
   <p>Estudiantes y equipo docente de la escuela ACAMPADOC, y las películas de la <b>Selección Oficial del Festival</b> (en rojo; no son cortos de estudiantes). Todos los caminos llevan a <b>La Villa de Los Santos, Panamá</b>. Gira el planeta y toca un país.</p>
-  <div class="mdesc">Escuela y festival de cine documental en La Villa de Los Santos, Panamá.</div>
+  <div class="mdesc">Escuela y festival de cine documental en La Villa de Los Santos, Panamá.<span class="lema">Cine al rescate de los patrimonios</span></div>
   <div class="mhint">Toca un país para ver a su gente y sus películas.</div>
   <div class="kpis">
     <div class="kpi est"><b id="kEst">0</b><small>Estudiantes</small></div>
@@ -836,7 +840,7 @@ function fillSede() {
   document.getElementById('tabs').innerHTML = '';
   const n = view.countries.length;
   const top = view.countries.slice().sort((a, b) => total(b) - total(a)).slice(0, 8);
-  document.getElementById('list').innerHTML = `<div class="sedeinfo">Aquí se encuentra la comunidad cada año. Con los filtros actuales llegan
+  document.getElementById('list').innerHTML = `<div class="sedeinfo"><b style="font-style:italic;color:var(--amarillo)">Cine al rescate de los patrimonios.</b><br>Aquí se encuentra la comunidad cada año. Con los filtros actuales llegan
     <b>${view.est.length}</b> estudiantes, <b>${new Set(view.doc.map(d => d.n)).size}</b> personas del equipo y docentes y <b>${view.pel.length}</b> películas desde <b>${n}</b> países.</div>
     <div class="grp">Países con más conexiones</div>` +
     top.map(c => `<div class="item" style="cursor:pointer" data-pa="${esc(c.pa)}"><div class="av" style="background:${C[mainLayer(c)]}">${total(c)}</div>
