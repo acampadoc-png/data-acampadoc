@@ -11,7 +11,8 @@
 <meta property="og:image" content="https://www.acampadoc.com/wp-content/uploads/2026/03/cropped-logo_Acampadoc_rev2026_PROFILE_ICON.png">
 <link rel="icon" href="https://www.acampadoc.com/wp-content/uploads/2026/03/cropped-logo_Acampadoc_rev2026_PROFILE_ICON.png">
 <link rel="preconnect" href="https://fonts.googleapis.com">
-<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+<!-- la fuente no bloquea la apertura: si la red es lenta, se usa la del sistema y luego cambia sola -->
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet" media="print" onload="this.media='all'">
 <style>
   :root {
     /* Marca ACAMPADOC: rojo #be202e, amarillo #ffcc33, café del logo #3B2209, crema #FCF6DB, coral #EE8C7D */
@@ -170,6 +171,49 @@
   .empty { padding: 24px 12px; color: var(--muted); font-size: 13px; text-align: center; }
   .sedeinfo { padding: 12px 10px 4px; font-size: 13px; line-height: 1.5; color: var(--muted); }
   .sedeinfo b { color: var(--text); }
+
+  /* ---------- pantalla de carga */
+  #cargando { position: fixed; inset: 0; z-index: 50; display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 10px;
+    background: radial-gradient(ellipse at 50% 45%, #3B2209 0%, var(--bg) 75%); transition: opacity .5s; text-align: center; padding: 24px; }
+  #cargando.fuera { opacity: 0; pointer-events: none; }
+  #cargando .cg-logo { position: relative; width: 84px; height: 84px; margin-bottom: 6px; }
+  #cargando .cg-logo img { width: 84px; height: 84px; border-radius: 50%; display: block; }
+  #cargando .cg-logo i { position: absolute; inset: -8px; border-radius: 50%; border: 3px solid rgba(255,204,51,.18); border-top-color: var(--amarillo); animation: giro 1s linear infinite; }
+  #cargando b { font-size: 12px; letter-spacing: .22em; color: var(--amarillo); }
+  #cargando .cg-txt { font-size: 14px; color: var(--muted); max-width: 320px; line-height: 1.45; }
+  #cargando button { display: none; margin-top: 8px; padding: 10px 18px; border-radius: 999px; border: 0; background: var(--amarillo); color: var(--cafe); font-weight: 700; cursor: pointer; }
+  #cargando.fallo button { display: block; } #cargando.fallo .cg-logo i { display: none; }
+  @keyframes giro { to { transform: rotate(360deg); } }
+  @media (prefers-reduced-motion: reduce) { #cargando .cg-logo i { animation-duration: 3s; } }
+
+  /* ---------- modo proyección (pantalla gigante y grabación de video) */
+  .btnpant { display: flex; align-items: center; justify-content: center; gap: 8px; width: 100%; padding: 9px 12px; cursor: pointer;
+    font-size: 12px; font-weight: 600; color: var(--muted); transition: color .2s, border-color .2s, opacity .4s; }
+  .btnpant:hover, .btnpant:focus-visible { color: var(--text); border-color: var(--amarillo); outline: none; }
+  #gira { position: fixed; left: 0; right: 0; bottom: 0; z-index: 12; padding: 14vh 5vw 6vh; text-align: center; opacity: 0; pointer-events: none;
+    background: linear-gradient(180deg, transparent, rgba(28,16,4,.82) 45%, rgba(28,16,4,.94)); transform: translateY(12px);
+    transition: opacity .6s, transform .6s; display: none; text-shadow: 0 2px 18px rgba(0,0,0,.6); }
+  #gira.ver { opacity: 1; transform: none; }
+  #gira b { display: block; font-size: clamp(30px, 4.2vw, 76px); font-weight: 800; letter-spacing: -.02em; line-height: 1.05; }
+  #gira span { display: block; margin-top: .5em; font-size: clamp(15px, 1.5vw, 28px); color: var(--muted); }
+  #gira span em { font-style: normal; font-weight: 700; color: var(--text); }
+  body.pantalla #gira { display: block; }
+  body.pantalla .tools .search, body.pantalla .tools .layers, body.pantalla .tools .subfilters,
+  body.pantalla .timeline, body.pantalla #panel, body.pantalla .brand p, body.pantalla .brand .mdesc, body.pantalla .brand .mhint,
+  body.pantalla .brand .mctl, body.pantalla .brand .btnmas, body.pantalla .brand .roundbtn { display: none !important; }
+  body.pantalla .tools { width: auto; }
+  body.pantalla .btnpant { opacity: 0; } body.pantalla.raton .btnpant, body.pantalla .btnpant:focus-visible { opacity: 1; }
+  body.pantalla .brand { width: clamp(340px, 26vw, 520px); padding: clamp(14px, 1.2vw, 24px); }
+  body.pantalla .brand .logo { width: clamp(54px, 4.4vw, 84px); height: clamp(54px, 4.4vw, 84px); flex-basis: clamp(54px, 4.4vw, 84px); }
+  body.pantalla .brand .kicker { font-size: clamp(10.5px, .8vw, 15px); }
+  body.pantalla .brand h1 { font-size: clamp(19px, 1.6vw, 32px); }
+  body.pantalla .kpis { margin-top: 14px; }
+  body.pantalla .kpi b { font-size: clamp(20px, 2vw, 40px); }
+  body.pantalla .kpi small { font-size: clamp(9.5px, .7vw, 13px); }
+  body.pantalla .musica { min-height: 0; padding: 6px 10px; margin-top: 12px; }
+  body.pantalla .musica .mtxt { display: none; }
+  body.pantalla .badge .pill, body.pantalla .sede .tag { zoom: 1.25; }   /* zoom solo por dentro: si se aplica al indicador entero se descoloca del mapa */
+  @media (max-width: 760px) { .btnpant { display: none; } }
 
   /* ---------- música y botones del celular */
   .musica { margin-top: 10px; width: 100%; display: flex; align-items: center; gap: 10px; min-height: 44px; padding: 8px 14px; border-radius: 12px; cursor: pointer;
@@ -370,6 +414,12 @@
 </style>
 </head>
 <body>
+<div id="cargando" role="status" aria-live="polite">
+  <div class="cg-logo"><img id="cgLogo" alt=""><i></i></div>
+  <b>ACAMPADOC</b>
+  <span class="cg-txt">Cargando la comunidad…</span>
+  <button type="button" onclick="location.reload()">Volver a intentar</button>
+</div>
 <div id="globe"></div>
 
 <section class="brand glass">
@@ -420,6 +470,10 @@
     <button class="mini on" data-p="Viveros">Viveros</button>
     <label><input type="checkbox" id="pending" checked> Por confirmar</label>
   </div>
+  <button id="btnPantalla" class="btnpant glass" type="button" title="Atajo: tecla P">
+    <svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M4 9V4h5M20 9V4h-5M4 15v5h5M20 15v5h-5"/></svg>
+    <span>Modo proyección</span>
+  </button>
 </section>
 
 <section class="timeline glass">
@@ -443,6 +497,8 @@
   <div id="list"></div>
 </aside>
 
+<div id="gira" aria-live="polite"><b></b><span></span></div>
+
 <div id="player" role="dialog" aria-modal="true" aria-label="Película">
   <div class="box">
     <div class="plbar"><b id="plTitle"></b><span id="plClave" hidden></span><a id="plLink" href="#" target="_blank" rel="noopener">Abrir en Vimeo ↗</a><button id="plClose" aria-label="Cerrar">×</button></div>
@@ -450,8 +506,15 @@
   </div>
 </div>
 
-<script src="https://cdn.jsdelivr.net/npm/topojson-client@3.1.0/dist/topojson-client.min.js"></script>
-<script src="https://cdn.jsdelivr.net/npm/globe.gl@2.33.1/dist/globe.gl.min.js"></script>
+<script src="lib/topojson-client.min.js"></script>
+<script src="lib/globe.gl.min.js"></script>
+<script>
+/* si la librería del globo no llegó, se dice con claridad en vez de dejar la pantalla en cero */
+if (!window.Globe) {
+  const c = document.getElementById('cargando');
+  if (c) { c.classList.add('fallo'); c.querySelector('.cg-txt').textContent = 'No se pudo cargar el globo. Revisa la conexión y vuelve a intentarlo.'; }
+}
+</script>
 <script>
 const DATA = /*__DATA__*/[];
 const EXTRA = /*__EXTRA__*/{};
@@ -521,6 +584,10 @@ const total = c => c.est.length + c.doc.length + c.pel.length;
 const mainLayer = c => [['est', c.est.length], ['doc', c.doc.length], ['pel', c.pel.length]].sort((a, b) => b[1] - a[1])[0][0];
 
 // ------------------------------------------------------------------ globo
+try { document.getElementById('cgLogo').src = LOGO; } catch (e) {}
+/* quita la pantalla de carga cuando el planeta ya tiene sus países (o a los 6 s, pase lo que pase) */
+const listo = () => { const c = document.getElementById('cargando'); if (c && !c.classList.contains('fallo')) { c.classList.add('fuera'); setTimeout(() => c.remove(), 600); } };
+setTimeout(listo, 6000);
 const BASE_ALT = innerWidth < 760 ? 3.4 : 2.3;
 // celulares y tabletas: menos resolución, menos arcos y etiquetas; sin animación si el sistema pide reducir movimiento
 const LITE = matchMedia('(max-width: 760px), (pointer: coarse)').matches;
@@ -553,11 +620,11 @@ const globe = Globe()(el)
 try { globe.renderer().setPixelRatio(Math.min(window.devicePixelRatio || 1, LITE ? 1.5 : 2)); } catch (e) {}
 try { const m = globe.globeMaterial(); m.color.set('#2a1806'); m.emissive && m.emissive.set('#1a0d02'); m.shininess = 4; } catch (e) {}
 
-fetch('https://cdn.jsdelivr.net/npm/world-atlas@2/countries-110m.json').then(r => r.json()).then(t => {
+fetch('lib/countries-110m.json').then(r => r.json()).then(t => {
   const feats = topojson.feature(t, t.objects.countries).features.filter(f => f.id !== '010');   // sin Antártida
   feats.forEach(f => { f.properties._pan = f.id === '591'; });                                   // Panamá resaltado
   globe.polygonsData(feats);
-}).catch(() => {});
+}).catch(() => {}).finally(() => setTimeout(listo, 250));
 
 globe.controls().autoRotate = !CALM;
 globe.controls().autoRotateSpeed = 0.35;
@@ -577,6 +644,23 @@ const syncPause = () => { const p = document.hidden || offscreen; if (p === paus
 document.addEventListener('visibilitychange', syncPause);
 if ('IntersectionObserver' in window) new IntersectionObserver(es => { offscreen = !es[0].isIntersecting; syncPause(); }).observe(el);
 ['pointerdown', 'wheel', 'touchstart'].forEach(ev => el.addEventListener(ev, () => globe.controls().autoRotate = false, { passive: true }));
+/* tras un rato sin que nadie toque nada, el planeta vuelve a girar (o, en modo proyección, retoma el recorrido) */
+let quietoT = 0;
+const despertar = () => {
+  clearTimeout(quietoT);
+  const pant = document.body.classList.contains('pantalla');
+  quietoT = setTimeout(() => {
+    const ocupado = document.getElementById('panel').classList.contains('open') || document.getElementById('player').classList.contains('open');
+    if (ocupado) return despertar();
+    if (pant) gira.seguir(); else if (!CALM) globe.controls().autoRotate = true;
+  }, pant ? 12000 : 20000);
+};
+['pointerdown', 'wheel', 'touchstart', 'keydown'].forEach(ev => addEventListener(ev, e => {
+  if (e.target && e.target.closest && e.target.closest('#btnPantalla')) return;
+  if (ev === 'keydown' && (e.key === 'p' || e.key === 'P')) return;
+  if (document.body.classList.contains('pantalla')) gira.pausar();
+  despertar();
+}, { passive: true }));
 
 // tamaño de puntos según zoom + ocultar indicadores en la cara oculta del planeta
 globe.controls().addEventListener('change', () => {
@@ -827,7 +911,7 @@ function fillSede() {
         .filter(([l]) => c[l].length).map(([l, t]) => `${l === 'doc' ? new Set(c.doc.map(d => d.n)).size : c[l].length} ${t}`).join(' · ')}</div></div></div>`).join('');
   document.querySelectorAll('#list .item[data-pa]').forEach(it => it.onclick = () => openCountry(it.dataset.pa));
 }
-function closePanel() { openPa = null; panel.classList.remove('open'); globe.ringsData(ringsBase()); }
+function closePanel() { openPa = null; panel.classList.remove('open'); globe.ringsData(ringsBase()); if (typeof despertar === 'function') despertar(); }
 panel.querySelector('.close').onclick = closePanel;
 
 // ------------------------------------------------------------------ reproductor de Vimeo
@@ -909,6 +993,65 @@ q.oninput = () => {
 };
 
 render();
+</script>
+<script>
+/* Modo proyección: pantalla completa, solo el planeta y las cifras, letra grande y un recorrido automático por los países.
+   Se activa con el botón, con la tecla P o abriendo el enlace con ?proyeccion al final. */
+const gira = (function () {
+  const caja = document.getElementById('gira'), tit = caja.querySelector('b'), sub = caja.querySelector('span');
+  const btn = document.getElementById('btnPantalla'), lbl = btn.querySelector('span');
+  let paso = -1, t = 0, ratonT = 0;
+  const plural = (n, s, p) => n + ' ' + (n === 1 ? s : p);
+  const total = c => c.est.length + c.doc.length + c.pel.length;
+  const lista = () => view.countries.filter(total).sort((a, b) => total(b) - total(a));
+  const mostrar = (titulo, partes) => {
+    caja.classList.remove('ver');
+    setTimeout(() => { tit.textContent = titulo; sub.innerHTML = partes.filter(Boolean).join(' · '); caja.classList.add('ver'); }, 450);
+  };
+  const siguiente = () => {
+    const ps = lista(); if (!ps.length) return;
+    paso = (paso + 1) % (ps.length + 1);
+    const ms = CALM ? 0 : 2200, em = x => '<em>' + x + '</em>';
+    if (paso === ps.length) {                       // al cerrar cada vuelta, regresa a la sede
+      globe.pointOfView({ lat: SEDE.lat - 10, lng: SEDE.lng, altitude: 1.7 }, ms); globe.ringsData(ringsBase());
+      mostrar('La Villa de Los Santos', ['Sede de ACAMPADOC · Panamá']);
+    } else {
+      const c = ps[paso];
+      globe.ringsData([...ringsBase(), { lat: c.lat, lng: c.lng, rgb: '255,204,51', max: 5, period: 1100, speed: 1.6 }]);   // pulso amarillo en el país
+      globe.pointOfView({ lat: c.lat - 10, lng: c.lng, altitude: 1.9 }, ms);
+      mostrar(c.pa, [c.est.length && em(plural(c.est.length, 'estudiante', 'estudiantes')),
+        c.doc.length && em(plural(c.doc.length, 'persona del equipo', 'personas del equipo')),
+        c.pel.length && em(plural(c.pel.length, 'película del festival', 'películas del festival'))]);
+    }
+    t = setTimeout(siguiente, 9000);
+  };
+  const seguir = () => { clearTimeout(t); globe.controls().autoRotate = false; siguiente(); };
+  const pausar = () => { clearTimeout(t); caja.classList.remove('ver'); globe.ringsData(ringsBase()); };
+  const activo = () => document.body.classList.contains('pantalla');
+  const poner = on => {
+    if (on === activo()) return;
+    document.body.classList.toggle('pantalla', on);
+    lbl.textContent = on ? 'Salir de proyección' : 'Modo proyección';
+    try {
+      if (on && !document.fullscreenElement && document.documentElement.requestFullscreen) document.documentElement.requestFullscreen().catch(() => {});
+      if (!on && document.fullscreenElement) document.exitFullscreen().catch(() => {});
+    } catch (e) {}
+    if (on) { closePanel(); paso = -1; seguir(); }
+    else { pausar(); globe.pointOfView({ lat: 8, lng: -78, altitude: BASE_ALT }, CALM ? 0 : 1400); globe.controls().autoRotate = !CALM; }
+    setTimeout(fit, 150);
+  };
+  btn.addEventListener('click', e => { e.stopPropagation(); poner(!activo()); });
+  addEventListener('keydown', e => {
+    if (e.target && /INPUT|TEXTAREA/.test(e.target.tagName)) return;
+    if (e.key === 'p' || e.key === 'P') poner(!activo());
+  });
+  document.addEventListener('fullscreenchange', () => { if (!document.fullscreenElement && activo()) poner(false); });
+  /* el botón de salir aparece solo al mover el ratón, para que no estorbe en la proyección */
+  addEventListener('mousemove', () => { if (!activo()) return; document.body.classList.add('raton'); clearTimeout(ratonT);
+    ratonT = setTimeout(() => document.body.classList.remove('raton'), 2500); }, { passive: true });
+  if (/[?&](proyeccion|pantalla)\b/.test(location.search)) setTimeout(() => poner(true), 600);
+  return { seguir, pausar };
+})();
 </script>
 <script>
 /* Música de fondo. Ligera: el audio NO se descarga hasta el primer toque o clic del visitante y se carga una pista a la vez.
