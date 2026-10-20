@@ -185,6 +185,7 @@
   .musica .mcol { display: flex; flex-direction: column; min-width: 0; line-height: 1.25; }
   .musica .mcred { font-weight: 500; font-size: 10.5px; color: var(--muted); white-space: normal; line-height: 1.35; text-align: left; }
   .musica .mcred:empty { display: none; }
+  .mtit { font-weight: 700; color: var(--crema); }
   @media (prefers-reduced-motion: reduce) { .musica.espera { animation: none; } }
 
   .mctl { display: flex; align-items: center; gap: 6px; margin-top: 8px; }
@@ -913,7 +914,7 @@ render();
 /* Música de fondo. Ligera: el audio NO se descarga hasta el primer toque o clic del visitante y se carga una pista a la vez.
    Archivos en la carpeta musica/. Con la lista vacía el botón no aparece. */
 (function () {
-  const MUSICA = [{s:"musica/pista-01.mp3",t:"Canajagua azul",a:"Paris Vasquez"},{s:"musica/pista-02.mp3",t:"Aires santeños",a:"Tradicional"},{s:"musica/pista-03.mp3",t:"La viudita de la miel",a:"Artemio Vargas"},{s:"musica/pista-04.mp3",t:"La flor de Liola",a:"Toñito Saenz"},{s:"musica/pista-05.mp3",t:"Me voy de Padasi",a:"Casimiro Pimentel"},{s:"musica/pista-06.mp3",t:"A Chitre",a:"Alberto Rodriguez"},{s:"musica/pista-07.mp3",t:"Sinceridad",a:"Toñito Saenz"},{s:"musica/pista-08.mp3",t:"Todo en la vida pasa",a:"Colaco Cortez"},{s:"musica/pista-09.mp3",t:"La espigadilla",a:"Gelo Cordoba"},{s:"musica/pista-10.mp3",t:"Pica pica",a:"Gelo Cordoba"},{s:"musica/pista-11.mp3",t:"Rascate",a:"D.R.A."},{s:"musica/pista-12.mp3",t:"Arroz con mango",a:"Colaco Cortez"},{s:"musica/pista-13.mp3",t:"El bandido",a:"D.R.A."},{s:"musica/pista-14.mp3",t:"Amor lindo",a:"Jose de la Rosa Cedeño"},{s:"musica/pista-15.mp3",t:"Mogollon",a:"Sacramento Cordoba"}];  // colección de música tradicional (Gelo Córdoba); títulos y autores tal como vienen en los archivos
+  const MUSICA = [{s:"musica/pista-01.mp3",t:"Canajagua azul",a:"Paris Vasquez"},{s:"musica/pista-02.mp3",t:"Aires santeños",a:"Tradicional"},{s:"musica/pista-03.mp3",t:"La viudita de la miel",a:"Artemio Vargas"},{s:"musica/pista-04.mp3",t:"La flor de Liola",a:"Toñito Saenz"},{s:"musica/pista-05.mp3",t:"Me voy de Padasi",a:"Casimiro Pimentel"},{s:"musica/pista-06.mp3",t:"A Chitré",a:"Alberto Rodriguez"},{s:"musica/pista-07.mp3",t:"Sinceridad",a:"Toñito Saenz"},{s:"musica/pista-08.mp3",t:"Todo en la vida pasa",a:"Colaco Cortez"},{s:"musica/pista-09.mp3",t:"La espigadilla",a:"Gelo Cordoba"},{s:"musica/pista-10.mp3",t:"Pica pica",a:"Gelo Cordoba"},{s:"musica/pista-11.mp3",t:"Rascate",a:"D.R.A."},{s:"musica/pista-12.mp3",t:"Arroz con mango",a:"Colaco Cortez"},{s:"musica/pista-13.mp3",t:"El bandido",a:"D.R.A."},{s:"musica/pista-14.mp3",t:"Amor lindo",a:"Jose de la Rosa Cedeño"},{s:"musica/pista-15.mp3",t:"Mogollón",a:"Sacramento Cordoba"}];  // colección de música tradicional (Gelo Córdoba); títulos y autores tal como vienen en los archivos
   let VOL = 0.35; const KEY = 'acampadoc-musica';
   const btn = document.getElementById('musica');
   if (!btn || !MUSICA.length) return;
@@ -925,14 +926,17 @@ render();
   vol.value = Math.round(VOL * 100);
   const guardar = v => { try { localStorage.setItem(KEY, v ? 'on' : 'off'); } catch (e) {} };
   const pintar = () => {
-    const m = MUSICA[pista], comp = m.a && m.a !== 'D.R.A.' && m.a !== 'Gelo Cordoba' ? ' (' + m.a + ')' : '';
-    const on = !audio.paused, tema = on ? '♪ Música de Gelo Córdoba' : 'Música de Gelo Córdoba';
+    const m = MUSICA[pista], on = !audio.paused;
+    /* nombre de la canción + crédito a Gelo Córdoba; antes del primer toque solo el crédito */
+    const linea = el => { el.textContent = ''; if (cargada) { const b = document.createElement('b'); b.className = 'mtit'; b.textContent = (on ? '♪ ' : '') + m.t; el.append(b, ' · '); }
+      el.append('Música de Gelo Córdoba'); };
     btn.classList.toggle('sonando', on); btn.setAttribute('aria-pressed', String(on));
     btn.classList.toggle('espera', !on && quiere && !cargada);
     txt.textContent = on ? 'Silenciar música' : 'Activar música';
     btn.setAttribute('aria-label', txt.textContent); btn.title = txt.textContent;
     ctl.hidden = !cargada;
-    cred.textContent = tema; if (now) now.textContent = tema;
+    linea(cred); if (now) linea(now);
+    if (cargada) btn.title = txt.textContent + ' · ' + m.t + ' (Gelo Córdoba)';
   };
   /* iPhone ignora audio.volume: el volumen se controla con Web Audio cuando existe */
   const preparar = () => {
