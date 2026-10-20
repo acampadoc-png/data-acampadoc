@@ -1079,9 +1079,15 @@ const gira = (function () {
     btn.setAttribute('aria-label', txt.textContent); btn.title = txt.textContent;
     ctl.hidden = !cargada;
     linea(cred); if (now) linea(now);
+    if (cargada && 'mediaSession' in navigator) try {
+      navigator.mediaSession.metadata = new MediaMetadata({ title: m.t, artist: 'Gelo Córdoba', album: 'ACAMPADOC · Comunidad', artwork: [{ src: LOGO, sizes: '160x160', type: 'image/png' }] });
+      navigator.mediaSession.playbackState = on ? 'playing' : 'paused';
+    } catch (e) {}
     if (cargada) btn.title = txt.textContent + ' · ' + m.t + ' (Gelo Córdoba)';
   };
   /* iPhone ignora audio.volume: el volumen se controla con Web Audio cuando existe */
+  /* iPhone: declarar la música como "reproducción" (no sonido ambiente) hace que los botones físicos de volumen la controlen */
+  try { if (navigator.audioSession) navigator.audioSession.type = 'playback'; } catch (e) {}
   const preparar = () => {
     if (ctx || !(window.AudioContext || window.webkitAudioContext)) return;
     try { ctx = new (window.AudioContext || window.webkitAudioContext)(); const src = ctx.createMediaElementSource(audio);
@@ -1110,6 +1116,14 @@ const gira = (function () {
   document.getElementById('mNext').addEventListener('click', e => { e.stopPropagation(); cambiar(1); });
   vol.addEventListener('input', () => { VOL = vol.value / 100; clearInterval(fade); if (!audio.paused) poner(VOL); try { localStorage.setItem(KEY + '-vol', String(VOL)); } catch (e) {} });
   btn.hidden = false; pintar();
+  /* controles del sistema (pantalla de bloqueo, centro de control, auriculares) */
+  if ('mediaSession' in navigator) try {
+    const ms = navigator.mediaSession;
+    ms.setActionHandler('play', () => { quiere = true; guardar(true); sonar(); });
+    ms.setActionHandler('pause', () => { quiere = false; guardar(false); parar(); });
+    ms.setActionHandler('nexttrack', () => cambiar(1));
+    ms.setActionHandler('previoustrack', () => cambiar(-1));
+  } catch (e) {}
   btn.addEventListener('click', e => { e.stopPropagation(); if (audio.paused) { quiere = true; guardar(true); sonar(); } else { quiere = false; guardar(false); parar(); } });
   /* en celular solo cuentan como permiso del navegador el toque terminado (touchend/pointerup/click) o una tecla; no el scroll ni el inicio del toque */
   const EV = ['pointerup', 'touchend', 'click', 'keydown'];
